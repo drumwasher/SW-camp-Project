@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'gpio_test'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.5
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Wed Jan 31 17:37:27 2024
+ * C/C++ source code generated on : Thu Feb  1 08:56:10 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -86,47 +86,15 @@ real_T rt_roundd_snf(real_T u)
 /* Model step function for TID0 */
 void gpio_test_step0(void)             /* Sample time: [0.1s, 0.0s] */
 {
-  uint16_T b_varargout_1;
   boolean_T c_value;
 
   {                                    /* Sample time: [0.1s, 0.0s] */
     rate_monotonic_scheduler();
   }
 
-  /* MATLABSystem: '<Root>/Analog Input' */
-  if (gpio_test_DW.obj_i.SampleTime != gpio_test_P.AnalogInput_SampleTime) {
-    gpio_test_DW.obj_i.SampleTime = gpio_test_P.AnalogInput_SampleTime;
-  }
-
-  gpio_test_DW.obj_i.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-    MW_AnalogIn_GetHandle(54UL);
-  MW_AnalogInSingle_ReadResult
-    (gpio_test_DW.obj_i.AnalogInDriverObj.MW_ANALOGIN_HANDLE, &b_varargout_1,
-     MW_ANALOGIN_UINT16);
-
-  /* DataTypeConversion: '<Root>/Data Type Conversion' incorporates:
-   *  Gain: '<Root>/Gain'
-   *  MATLABSystem: '<Root>/Analog Input'
-   * */
-  gpio_test_B.DataTypeConversion = (uint8_T)(((uint32_T)gpio_test_P.Gain_Gain *
-    b_varargout_1) >> 17);
-
-  /* MATLABSystem: '<Root>/Analog Input1' */
-  if (gpio_test_DW.obj.SampleTime != gpio_test_P.AnalogInput1_SampleTime) {
-    gpio_test_DW.obj.SampleTime = gpio_test_P.AnalogInput1_SampleTime;
-  }
-
-  gpio_test_DW.obj.AnalogInDriverObj.MW_ANALOGIN_HANDLE = MW_AnalogIn_GetHandle
-    (55UL);
-
-  /* MATLABSystem: '<Root>/Analog Input1' */
-  MW_AnalogInSingle_ReadResult
-    (gpio_test_DW.obj.AnalogInDriverObj.MW_ANALOGIN_HANDLE,
-     &gpio_test_B.AnalogInput1, MW_ANALOGIN_UINT16);
-
   /* MATLABSystem: '<Root>/Digital Input' */
-  if (gpio_test_DW.obj_b.SampleTime != gpio_test_P.DigitalInput_SampleTime) {
-    gpio_test_DW.obj_b.SampleTime = gpio_test_P.DigitalInput_SampleTime;
+  if (gpio_test_DW.obj.SampleTime != gpio_test_P.DigitalInput_SampleTime) {
+    gpio_test_DW.obj.SampleTime = gpio_test_P.DigitalInput_SampleTime;
   }
 
   c_value = readDigitalPin(3);
@@ -201,57 +169,39 @@ void gpio_test_initialize(void)
   gpio_test_M->Timing.stepSize0 = 0.1;
 
   /* External mode info */
-  gpio_test_M->Sizes.checksums[0] = (1807616047U);
-  gpio_test_M->Sizes.checksums[1] = (3761548464U);
-  gpio_test_M->Sizes.checksums[2] = (1200475672U);
-  gpio_test_M->Sizes.checksums[3] = (2779038210U);
+  gpio_test_M->Sizes.checksums[0] = (994761748U);
+  gpio_test_M->Sizes.checksums[1] = (2978567869U);
+  gpio_test_M->Sizes.checksums[2] = (3026545674U);
+  gpio_test_M->Sizes.checksums[3] = (1886020391U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
     static RTWExtModeInfo rt_ExtModeInfo;
-    static const sysRanDType *systemRan[6];
+    static const sysRanDType *systemRan[4];
     gpio_test_M->extModeInfo = (&rt_ExtModeInfo);
     rteiSetSubSystemActiveVectorAddresses(&rt_ExtModeInfo, systemRan);
     systemRan[0] = &rtAlwaysEnabled;
     systemRan[1] = &rtAlwaysEnabled;
     systemRan[2] = &rtAlwaysEnabled;
     systemRan[3] = &rtAlwaysEnabled;
-    systemRan[4] = &rtAlwaysEnabled;
-    systemRan[5] = &rtAlwaysEnabled;
     rteiSetModelMappingInfoPtr(gpio_test_M->extModeInfo,
       &gpio_test_M->SpecialInfo.mappingInfo);
     rteiSetChecksumsPtr(gpio_test_M->extModeInfo, gpio_test_M->Sizes.checksums);
     rteiSetTPtr(gpio_test_M->extModeInfo, rtmGetTPtr(gpio_test_M));
   }
 
-  /* Start for MATLABSystem: '<Root>/Analog Input' */
-  gpio_test_DW.obj_i.matlabCodegenIsDeleted = false;
-  gpio_test_DW.obj_i.SampleTime = gpio_test_P.AnalogInput_SampleTime;
-  gpio_test_DW.obj_i.isInitialized = 1L;
-  gpio_test_DW.obj_i.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-    MW_AnalogInSingle_Open(54UL);
-  gpio_test_DW.obj_i.isSetupComplete = true;
-
-  /* Start for MATLABSystem: '<Root>/Analog Input1' */
+  /* Start for MATLABSystem: '<Root>/Digital Input' */
   gpio_test_DW.obj.matlabCodegenIsDeleted = false;
-  gpio_test_DW.obj.SampleTime = gpio_test_P.AnalogInput1_SampleTime;
+  gpio_test_DW.obj.SampleTime = gpio_test_P.DigitalInput_SampleTime;
   gpio_test_DW.obj.isInitialized = 1L;
-  gpio_test_DW.obj.AnalogInDriverObj.MW_ANALOGIN_HANDLE = MW_AnalogInSingle_Open
-    (55UL);
+  digitalIOSetup(3, 0);
   gpio_test_DW.obj.isSetupComplete = true;
 
-  /* Start for MATLABSystem: '<Root>/Digital Input' */
-  gpio_test_DW.obj_b.matlabCodegenIsDeleted = false;
-  gpio_test_DW.obj_b.SampleTime = gpio_test_P.DigitalInput_SampleTime;
-  gpio_test_DW.obj_b.isInitialized = 1L;
-  digitalIOSetup(3, 0);
-  gpio_test_DW.obj_b.isSetupComplete = true;
-
   /* Start for MATLABSystem: '<Root>/Digital Output1' */
-  gpio_test_DW.obj_ib.matlabCodegenIsDeleted = false;
-  gpio_test_DW.obj_ib.isInitialized = 1L;
+  gpio_test_DW.obj_i.matlabCodegenIsDeleted = false;
+  gpio_test_DW.obj_i.isInitialized = 1L;
   digitalIOSetup(12, 1);
-  gpio_test_DW.obj_ib.isSetupComplete = true;
+  gpio_test_DW.obj_i.isSetupComplete = true;
 
   /* Start for MATLABSystem: '<Root>/Digital Output' */
   gpio_test_DW.obj_p.matlabCodegenIsDeleted = false;
@@ -263,40 +213,16 @@ void gpio_test_initialize(void)
 /* Model terminate function */
 void gpio_test_terminate(void)
 {
-  /* Terminate for MATLABSystem: '<Root>/Analog Input' */
-  if (!gpio_test_DW.obj_i.matlabCodegenIsDeleted) {
-    gpio_test_DW.obj_i.matlabCodegenIsDeleted = true;
-    if ((gpio_test_DW.obj_i.isInitialized == 1L) &&
-        gpio_test_DW.obj_i.isSetupComplete) {
-      gpio_test_DW.obj_i.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-        MW_AnalogIn_GetHandle(54UL);
-      MW_AnalogIn_Close(gpio_test_DW.obj_i.AnalogInDriverObj.MW_ANALOGIN_HANDLE);
-    }
-  }
-
-  /* End of Terminate for MATLABSystem: '<Root>/Analog Input' */
-  /* Terminate for MATLABSystem: '<Root>/Analog Input1' */
+  /* Terminate for MATLABSystem: '<Root>/Digital Input' */
   if (!gpio_test_DW.obj.matlabCodegenIsDeleted) {
     gpio_test_DW.obj.matlabCodegenIsDeleted = true;
-    if ((gpio_test_DW.obj.isInitialized == 1L) &&
-        gpio_test_DW.obj.isSetupComplete) {
-      gpio_test_DW.obj.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-        MW_AnalogIn_GetHandle(55UL);
-      MW_AnalogIn_Close(gpio_test_DW.obj.AnalogInDriverObj.MW_ANALOGIN_HANDLE);
-    }
-  }
-
-  /* End of Terminate for MATLABSystem: '<Root>/Analog Input1' */
-  /* Terminate for MATLABSystem: '<Root>/Digital Input' */
-  if (!gpio_test_DW.obj_b.matlabCodegenIsDeleted) {
-    gpio_test_DW.obj_b.matlabCodegenIsDeleted = true;
   }
 
   /* End of Terminate for MATLABSystem: '<Root>/Digital Input' */
 
   /* Terminate for MATLABSystem: '<Root>/Digital Output1' */
-  if (!gpio_test_DW.obj_ib.matlabCodegenIsDeleted) {
-    gpio_test_DW.obj_ib.matlabCodegenIsDeleted = true;
+  if (!gpio_test_DW.obj_i.matlabCodegenIsDeleted) {
+    gpio_test_DW.obj_i.matlabCodegenIsDeleted = true;
   }
 
   /* End of Terminate for MATLABSystem: '<Root>/Digital Output1' */

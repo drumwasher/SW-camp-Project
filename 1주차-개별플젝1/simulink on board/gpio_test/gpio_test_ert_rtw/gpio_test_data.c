@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'gpio_test'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.5
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Wed Jan 31 17:37:27 2024
+ * C/C++ source code generated on : Thu Feb  1 08:56:10 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -21,16 +21,6 @@
 
 /* Block parameters (default storage) */
 P_gpio_test_T gpio_test_P = {
-  /* Expression: -1
-   * Referenced by: '<Root>/Analog Input'
-   */
-  -1.0,
-
-  /* Expression: -1
-   * Referenced by: '<Root>/Analog Input1'
-   */
-  -1.0,
-
   /* Expression: 0.1
    * Referenced by: '<Root>/Digital Input'
    */
@@ -54,12 +44,7 @@ P_gpio_test_T gpio_test_P = {
   /* Expression: 0
    * Referenced by: '<Root>/Pulse Generator'
    */
-  0.0,
-
-  /* Computed Parameter: Gain_Gain
-   * Referenced by: '<Root>/Gain'
-   */
-  32768U
+  0.0
 };
 
 /*

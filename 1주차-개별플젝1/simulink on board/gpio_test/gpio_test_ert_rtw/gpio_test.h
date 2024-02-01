@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'gpio_test'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.5
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Wed Jan 31 17:37:27 2024
+ * C/C++ source code generated on : Thu Feb  1 08:56:10 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -26,7 +26,6 @@
 #include "sysran_types.h"
 #include "rtw_continuous.h"
 #include "rtw_solver.h"
-#include "MW_AnalogIn.h"
 #include "MW_arduino_digitalio.h"
 #endif                                 /* gpio_test_COMMON_INCLUDES_ */
 
@@ -85,17 +84,13 @@
 /* Block signals (default storage) */
 typedef struct {
   real_T PulseGenerator;               /* '<Root>/Pulse Generator' */
-  uint16_T AnalogInput1;               /* '<Root>/Analog Input1' */
-  uint8_T DataTypeConversion;          /* '<Root>/Data Type Conversion' */
   boolean_T NOT;                       /* '<Root>/NOT' */
 } B_gpio_test_T;
 
 /* Block states (default storage) for system '<Root>' */
 typedef struct {
-  codertarget_arduinobase_inter_T obj; /* '<Root>/Analog Input1' */
-  codertarget_arduinobase_inter_T obj_i;/* '<Root>/Analog Input' */
-  codertarget_arduinobase_block_T obj_b;/* '<Root>/Digital Input' */
-  codertarget_arduinobase_blo_o_T obj_ib;/* '<Root>/Digital Output1' */
+  codertarget_arduinobase_block_T obj; /* '<Root>/Digital Input' */
+  codertarget_arduinobase_blo_o_T obj_i;/* '<Root>/Digital Output1' */
   codertarget_arduinobase_blo_o_T obj_p;/* '<Root>/Digital Output' */
   struct {
     void *LoggedData;
@@ -106,12 +101,6 @@ typedef struct {
 
 /* Parameters (default storage) */
 struct P_gpio_test_T_ {
-  real_T AnalogInput_SampleTime;       /* Expression: -1
-                                        * Referenced by: '<Root>/Analog Input'
-                                        */
-  real_T AnalogInput1_SampleTime;      /* Expression: -1
-                                        * Referenced by: '<Root>/Analog Input1'
-                                        */
   real_T DigitalInput_SampleTime;      /* Expression: 0.1
                                         * Referenced by: '<Root>/Digital Input'
                                         */
@@ -126,9 +115,6 @@ struct P_gpio_test_T_ {
                                        */
   real_T PulseGenerator_PhaseDelay;    /* Expression: 0
                                         * Referenced by: '<Root>/Pulse Generator'
-                                        */
-  uint16_T Gain_Gain;                  /* Computed Parameter: Gain_Gain
-                                        * Referenced by: '<Root>/Gain'
                                         */
 };
 
@@ -197,13 +183,6 @@ extern void gpio_test_terminate(void);
 extern RT_MODEL_gpio_test_T *const gpio_test_M;
 extern volatile boolean_T stopRequested;
 extern volatile boolean_T runModel;
-
-/*-
- * These blocks were eliminated from the model due to optimizations:
- *
- * Block '<Root>/Data Type Conversion1' : Unused code path elimination
- * Block '<Root>/Gain1' : Unused code path elimination
- */
 
 /*-
  * The generated code includes comments that allow you to trace directly

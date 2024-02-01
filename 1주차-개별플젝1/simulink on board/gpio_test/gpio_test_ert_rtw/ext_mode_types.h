@@ -7,9 +7,9 @@
  *
  * Code generation for model "gpio_test".
  *
- * Model version              : 1.3
+ * Model version              : 1.5
  * Simulink Coder version : 23.2 (R2023b) 01-Aug-2023
- * C source code generated on : Wed Jan 31 17:37:27 2024
+ * C source code generated on : Thu Feb  1 08:56:10 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

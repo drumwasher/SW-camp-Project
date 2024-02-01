@@ -1,9 +1,9 @@
 
 avrdude: AVR device initialized and ready to accept instructions
 avrdude: Device signature = 0x1e9801 (probably m2560)
-avrdude: reading input file "C:\Users\tkdle\OneDrive\바탕 화면\SW-camp-Project\1주차-개별플젝1\새 폴더/gpio_test.hex"
-avrdude: writing flash (24006 bytes):
-avrdude: 24006 bytes of flash written
+avrdude: reading input file "C:\Users\tkdle\OneDrive\바탕 화면\SW-camp-Project\1주차-개별플젝1\simulink on board\gpio_test/gpio_test.hex"
+avrdude: writing flash (23190 bytes):
+avrdude: 23190 bytes of flash written
 
 avrdude done.  Thank you.
 

@@ -1,6 +1,6 @@
 xcp_ext_param_default_serial.o: \
  C:\PROGRA~1\MATLAB\R2023b\toolbox\coder\xcp\src\target\ext_mode\src\xcp_ext_param_default_serial.c \
- C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/1주차-~1/새폴더~1/gpio_test_ert_rtw/rtwtypes.h \
+ C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/1주차-~1/SIMULI~1/GPIO_T~2/gpio_test_ert_rtw/rtwtypes.h \
  C:/PROGRA~1/MATLAB/R2023b/simulink/include/rtw_extmode.h \
  C:/PROGRA~1/MATLAB/R2023b/toolbox/coder/xcp/src/target/server/common/xcp_common.h \
  C:/PROGRA~1/MATLAB/R2023b/toolbox/coder/xcp/src/target/server/platform/include/xcp_platform.h \
@@ -10,7 +10,7 @@ xcp_ext_param_default_serial.o: \
  C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/variants/mega/pins_arduino.h \
  C:\PROGRA~1\MATLAB\R2023b\toolbox\coder\xcp\src\target\ext_mode\src\xcp_ext_param.h
 
-C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/1주차-~1/새폴더~1/gpio_test_ert_rtw/rtwtypes.h:
+C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/1주차-~1/SIMULI~1/GPIO_T~2/gpio_test_ert_rtw/rtwtypes.h:
 
 C:/PROGRA~1/MATLAB/R2023b/simulink/include/rtw_extmode.h:
 
