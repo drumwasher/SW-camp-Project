@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ACC'.
  *
- * Model version                  : 1.1
+ * Model version                  : 1.17
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Fri Feb  2 17:20:40 2024
+ * C/C++ source code generated on : Sat Feb  3 21:57:23 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

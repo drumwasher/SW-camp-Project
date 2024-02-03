@@ -9,7 +9,7 @@ function [taskInfo, numtask, isDeploymentDiagram]=extmode_task_info()
             taskInfo(1).entryPoints = {};
             taskInfo(1).nonFcnCallPartitionName = 'D1';
 
-            taskInfo(2).samplePeriod = 0.2;
+            taskInfo(2).samplePeriod = 0.1;
             taskInfo(2).sampleOffset = 0.0;
 
                 taskInfo(2).taskPrio = 40;
@@ -18,7 +18,7 @@ function [taskInfo, numtask, isDeploymentDiagram]=extmode_task_info()
             taskInfo(2).entryPoints = {};
             taskInfo(2).nonFcnCallPartitionName = 'D1';
 
-            taskInfo(3).samplePeriod = 1.0;
+            taskInfo(3).samplePeriod = 0.2;
             taskInfo(3).sampleOffset = 0.0;
 
                 taskInfo(3).taskPrio = 40;
@@ -27,17 +27,17 @@ function [taskInfo, numtask, isDeploymentDiagram]=extmode_task_info()
             taskInfo(3).entryPoints = {};
             taskInfo(3).nonFcnCallPartitionName = 'D1';
 
-            taskInfo(4).samplePeriod = -1.0;
-            taskInfo(4).sampleOffset = -2.0;
+            taskInfo(4).samplePeriod = 1.0;
+            taskInfo(4).sampleOffset = 0.0;
 
-                taskInfo(4).taskPrio = 0;
+                taskInfo(4).taskPrio = 40;
 
                 taskInfo(4).taskName = ['SubRate' '3'];
             taskInfo(4).entryPoints = {};
-            taskInfo(4).nonFcnCallPartitionName = '';
+            taskInfo(4).nonFcnCallPartitionName = 'D1';
 
             taskInfo(5).samplePeriod = -1.0;
-            taskInfo(5).sampleOffset = -3.0;
+            taskInfo(5).sampleOffset = -2.0;
 
                 taskInfo(5).taskPrio = 0;
 
@@ -45,10 +45,19 @@ function [taskInfo, numtask, isDeploymentDiagram]=extmode_task_info()
             taskInfo(5).entryPoints = {};
             taskInfo(5).nonFcnCallPartitionName = '';
 
+            taskInfo(6).samplePeriod = -1.0;
+            taskInfo(6).sampleOffset = -3.0;
+
+                taskInfo(6).taskPrio = 0;
+
+                taskInfo(6).taskName = ['SubRate' '5'];
+            taskInfo(6).entryPoints = {};
+            taskInfo(6).nonFcnCallPartitionName = '';
 
 
 
-    numtask = 5;
+
+    numtask = 6;
     for i = 1:numtask
     if ( 0 == isnumeric(taskInfo(i).samplePeriod) )
     taskInfo(i).samplePeriod = evalin('base', 'str2double(taskInfo(i).samplePeriod)');

@@ -1,0 +1,9 @@
+clear;
+Red_LED=22;
+Blue_LED=23;
+Switch_1=20;
+Switch_2=21;
+US_trigger=50;
+US_echo=51;
+Potentiometer=8;
+Motor=11;
