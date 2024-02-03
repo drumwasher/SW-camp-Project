@@ -2,8 +2,8 @@
 avrdude: AVR device initialized and ready to accept instructions
 avrdude: Device signature = 0x1e9801 (probably m2560)
 avrdude: reading input file "C:\Users\tkdle\OneDrive\바탕 화면\SW-camp-Project\1주차-개별플젝1\ACC project/ACC.hex"
-avrdude: writing flash (31186 bytes):
-avrdude: 31186 bytes of flash written
+avrdude: writing flash (12148 bytes):
+avrdude: 12148 bytes of flash written
 
 avrdude done.  Thank you.
 

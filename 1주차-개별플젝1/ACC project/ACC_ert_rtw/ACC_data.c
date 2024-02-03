@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ACC'.
  *
- * Model version                  : 1.17
+ * Model version                  : 1.4
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb  3 21:57:23 2024
+ * C/C++ source code generated on : Sat Feb  3 22:36:17 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -60,11 +60,6 @@ P_ACC_T ACC_P = {
    * Referenced by: '<S6>/Constant'
    */
   1.0,
-
-  /* Expression: 0
-   * Referenced by: '<Root>/Data Store Memory'
-   */
-  0.0,
 
   /* Expression: 100
    * Referenced by: '<S4>/Gain'
@@ -161,17 +156,17 @@ P_ACC_T ACC_P = {
    */
   0.0,
 
-  /* Expression: 0
-   * Referenced by: '<S3>/Constant'
-   */
-  0.0,
-
   /* Expression: 2
    * Referenced by: '<S3>/Constant1'
    */
   2.0,
 
-  /* Computed Parameter: Gain_Gain_a
+  /* Expression: 0
+   * Referenced by: '<S3>/Constant'
+   */
+  0.0,
+
+  /* Computed Parameter: Gain_Gain_f
    * Referenced by: '<S3>/Gain'
    */
   32768U

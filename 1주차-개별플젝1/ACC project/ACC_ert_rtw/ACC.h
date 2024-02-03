@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ACC'.
  *
- * Model version                  : 1.17
+ * Model version                  : 1.4
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb  3 21:57:23 2024
+ * C/C++ source code generated on : Sat Feb  3 22:36:17 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -56,11 +56,11 @@ typedef struct {
 /* Block states (default storage) for system '<Root>' */
 typedef struct {
   codertarget_arduinobase_inter_T obj; /* '<Root>/Analog Input' */
-  codertarget_arduinobase_block_T obj_c;/* '<Root>/Digital Output4' */
-  codertarget_arduinobase_block_T obj_o;/* '<Root>/Digital Output' */
-  codertarget_arduinobase_int_e_T obj_a;/* '<Root>/PWM' */
+  codertarget_arduinobase_block_T obj_h;/* '<Root>/Digital Output4' */
+  codertarget_arduinobase_block_T obj_n;/* '<Root>/Digital Output' */
+  codertarget_arduinobase_int_e_T obj_f;/* '<Root>/PWM' */
   real_T Delay_DSTATE;                 /* '<S10>/Delay' */
-  real_T Delay_DSTATE_l;               /* '<S9>/Delay' */
+  real_T Delay_DSTATE_m;               /* '<S9>/Delay' */
   volatile real_T TmpRTBAtFunctionCallSubsystem4O;/* synthesized block */
   volatile real_T TmpRTBAtFunctionCallSubsystem_e;/* synthesized block */
   volatile real_T TmpRTBAtFunctionCallSubsystem6O;/* synthesized block */
@@ -68,10 +68,10 @@ typedef struct {
   real_T a;                            /* '<S3>/Chart' */
   real_T v1;                           /* '<S2>/Chart' */
   real_T v2;                           /* '<S2>/Chart' */
-  codertarget_arduinobase_in_e3_T obj_ok;/* '<Root>/Ultrasonic Sensor' */
+  codertarget_arduinobase_in_e3_T obj_i;/* '<Root>/Ultrasonic Sensor' */
   int32_T clockTickCounter;            /* '<S4>/Pulse Generator' */
-  int32_T clockTickCounter_n;          /* '<S2>/Pulse Generator6' */
-  int32_T clockTickCounter_b;          /* '<S2>/Pulse Generator7' */
+  int32_T clockTickCounter_g;          /* '<S2>/Pulse Generator6' */
+  int32_T clockTickCounter_n;          /* '<S2>/Pulse Generator7' */
   volatile int8_T TmpRTBAtFunctionCallSubsystem_f;/* synthesized block */
   volatile int8_T TmpRTBAtFunctionCallSubsystem_o;/* synthesized block */
   volatile int8_T TmpRTBAtFunctionCallSubsystem_c;/* synthesized block */
@@ -101,17 +101,14 @@ struct P_ACC_T_ {
   real_T sw2_Y0;                       /* Computed Parameter: sw2_Y0
                                         * Referenced by: '<S10>/sw2'
                                         */
-  real_T Constant_Value_g;             /* Expression: 1
+  real_T Constant_Value_e;             /* Expression: 1
                                         * Referenced by: '<S10>/Constant'
                                         */
-  real_T Delay_InitialCondition_g;     /* Expression: 0.0
+  real_T Delay_InitialCondition_d;     /* Expression: 0.0
                                         * Referenced by: '<S10>/Delay'
                                         */
-  real_T Constant_Value_o;             /* Expression: 1
+  real_T Constant_Value_b;             /* Expression: 1
                                         * Referenced by: '<S6>/Constant'
-                                        */
-  real_T DataStoreMemory_InitialValue; /* Expression: 0
-                                        * Referenced by: '<Root>/Data Store Memory'
                                         */
   real_T Gain_Gain;                    /* Expression: 100
                                         * Referenced by: '<S4>/Gain'
@@ -134,7 +131,7 @@ struct P_ACC_T_ {
   real_T Constant3_Value;              /* Expression: 1
                                         * Referenced by: '<S4>/Constant3'
                                         */
-  real_T Constant_Value_h;             /* Expression: 1
+  real_T Constant_Value_ei;            /* Expression: 1
                                         * Referenced by: '<S4>/Constant'
                                         */
   real_T Constant2_Value;              /* Expression: 2
@@ -170,13 +167,13 @@ struct P_ACC_T_ {
   real_T PulseGenerator7_PhaseDelay;   /* Expression: 0
                                         * Referenced by: '<S2>/Pulse Generator7'
                                         */
-  real_T Constant_Value_k;             /* Expression: 0
-                                        * Referenced by: '<S3>/Constant'
-                                        */
-  real_T Constant1_Value_i;            /* Expression: 2
+  real_T Constant1_Value_j;            /* Expression: 2
                                         * Referenced by: '<S3>/Constant1'
                                         */
-  uint16_T Gain_Gain_a;                /* Computed Parameter: Gain_Gain_a
+  real_T Constant_Value_g;             /* Expression: 0
+                                        * Referenced by: '<S3>/Constant'
+                                        */
+  uint16_T Gain_Gain_f;                /* Computed Parameter: Gain_Gain_f
                                         * Referenced by: '<S3>/Gain'
                                         */
 };

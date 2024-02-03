@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ACC'.
  *
- * Model version                  : 1.17
+ * Model version                  : 1.4
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb  3 21:57:23 2024
+ * C/C++ source code generated on : Sat Feb  3 22:36:17 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -52,7 +52,7 @@ void MW_ISR_20(void)
      *  Constant: '<S9>/Constant'
      *  Delay: '<S9>/Delay'
      */
-    ACC_DW.Delay_DSTATE_l = ACC_P.Constant_Value - ACC_DW.Delay_DSTATE_l;
+    ACC_DW.Delay_DSTATE_m = ACC_P.Constant_Value - ACC_DW.Delay_DSTATE_m;
 
     /* End of Outputs for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt5' */
 
@@ -75,9 +75,9 @@ void MW_ISR_20(void)
     }
 
     if (ACC_DW.TmpRTBAtFunctionCallSubsystem_f != 0) {
-      ACC_DW.TmpRTBAtFunctionCallSubsystem_e = ACC_DW.Delay_DSTATE_l;
+      ACC_DW.TmpRTBAtFunctionCallSubsystem_e = ACC_DW.Delay_DSTATE_m;
     } else {
-      ACC_DW.TmpRTBAtFunctionCallSubsystem4O = ACC_DW.Delay_DSTATE_l;
+      ACC_DW.TmpRTBAtFunctionCallSubsystem4O = ACC_DW.Delay_DSTATE_m;
     }
 
     ACC_DW.TmpRTBAtFunctionCallSubsystem_c =
@@ -101,7 +101,7 @@ void MW_ISR_21(void)
      *  Constant: '<S10>/Constant'
      *  Delay: '<S10>/Delay'
      */
-    ACC_DW.Delay_DSTATE = ACC_P.Constant_Value_g - ACC_DW.Delay_DSTATE;
+    ACC_DW.Delay_DSTATE = ACC_P.Constant_Value_e - ACC_DW.Delay_DSTATE;
 
     /* End of Outputs for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt6' */
 
@@ -210,8 +210,8 @@ void ACC_step(void)
   uint8_T tmp;
   if (ACC_M->Timing.TaskCounters.TID[1] == 0) {
     /* MATLABSystem: '<Root>/Ultrasonic Sensor' */
-    if (ACC_DW.obj_ok.TunablePropsChanged) {
-      ACC_DW.obj_ok.TunablePropsChanged = false;
+    if (ACC_DW.obj_i.TunablePropsChanged) {
+      ACC_DW.obj_i.TunablePropsChanged = false;
     }
 
     MW_UltrasonicRead(&duration, 1, 50, 51, 10);
@@ -246,7 +246,7 @@ void ACC_step(void)
       /* Outputs for IfAction SubSystem: '<S4>/If Action Subsystem' incorporates:
        *  ActionPort: '<S15>/Action Port'
        */
-      ACC_IfActionSubsystem(ACC_P.Constant_Value_h, ACC_P.Constant2_Value,
+      ACC_IfActionSubsystem(ACC_P.Constant_Value_ei, ACC_P.Constant2_Value,
                             &ACC_B.Merge, &rtb_Merge);
 
       /* End of Outputs for SubSystem: '<S4>/If Action Subsystem' */
@@ -430,72 +430,31 @@ void ACC_step(void)
   /* End of MATLABSystem: '<Root>/Digital Output' */
   if (ACC_M->Timing.TaskCounters.TID[2] == 0) {
     /* DiscretePulseGenerator: '<S2>/Pulse Generator6' */
-    ACC_B.PulseGenerator6 = (ACC_DW.clockTickCounter_n <
-      ACC_P.PulseGenerator6_Duty) && (ACC_DW.clockTickCounter_n >= 0L) ?
+    ACC_B.PulseGenerator6 = (ACC_DW.clockTickCounter_g <
+      ACC_P.PulseGenerator6_Duty) && (ACC_DW.clockTickCounter_g >= 0L) ?
       ACC_P.PulseGenerator6_Amp : 0.0;
 
     /* DiscretePulseGenerator: '<S2>/Pulse Generator6' */
-    if (ACC_DW.clockTickCounter_n >= ACC_P.PulseGenerator6_Period - 1.0) {
-      ACC_DW.clockTickCounter_n = 0L;
+    if (ACC_DW.clockTickCounter_g >= ACC_P.PulseGenerator6_Period - 1.0) {
+      ACC_DW.clockTickCounter_g = 0L;
     } else {
-      ACC_DW.clockTickCounter_n++;
+      ACC_DW.clockTickCounter_g++;
     }
   }
 
   if (ACC_M->Timing.TaskCounters.TID[3] == 0) {
     /* DiscretePulseGenerator: '<S2>/Pulse Generator7' */
-    ACC_B.PulseGenerator7 = (ACC_DW.clockTickCounter_b <
-      ACC_P.PulseGenerator7_Duty) && (ACC_DW.clockTickCounter_b >= 0L) ?
+    ACC_B.PulseGenerator7 = (ACC_DW.clockTickCounter_n <
+      ACC_P.PulseGenerator7_Duty) && (ACC_DW.clockTickCounter_n >= 0L) ?
       ACC_P.PulseGenerator7_Amp : 0.0;
 
     /* DiscretePulseGenerator: '<S2>/Pulse Generator7' */
-    if (ACC_DW.clockTickCounter_b >= ACC_P.PulseGenerator7_Period - 1.0) {
-      ACC_DW.clockTickCounter_b = 0L;
+    if (ACC_DW.clockTickCounter_n >= ACC_P.PulseGenerator7_Period - 1.0) {
+      ACC_DW.clockTickCounter_n = 0L;
     } else {
-      ACC_DW.clockTickCounter_b++;
+      ACC_DW.clockTickCounter_n++;
     }
   }
-
-  /* If: '<S2>/If5' incorporates:
-   *  Constant: '<S6>/Constant'
-   *  MATLABSystem: '<Root>/Digital Output4'
-   *  SignalConversion generated from: '<S5>/In1'
-   *  SignalConversion generated from: '<S7>/In1'
-   */
-  if (rtb_state == 1) {
-    /* Outputs for IfAction SubSystem: '<S2>/ACC standby2' incorporates:
-     *  ActionPort: '<S7>/ACC standby'
-     */
-    rtb_Gain = ACC_B.PulseGenerator6;
-
-    /* End of Outputs for SubSystem: '<S2>/ACC standby2' */
-  } else if (rtb_state == 2) {
-    rtb_Gain = ACC_P.Constant_Value_o;
-  } else {
-    /* Outputs for IfAction SubSystem: '<S2>/ACC off5' incorporates:
-     *  ActionPort: '<S5>/Action Port'
-     */
-    rtb_Gain = ACC_B.PulseGenerator7;
-
-    /* End of Outputs for SubSystem: '<S2>/ACC off5' */
-  }
-
-  rtb_Gain = rt_roundd_snf(rtb_Gain);
-
-  /* End of If: '<S2>/If5' */
-
-  /* MATLABSystem: '<Root>/Digital Output4' */
-  if (rtb_Gain < 256.0) {
-    if (rtb_Gain >= 0.0) {
-      tmp = (uint8_T)rtb_Gain;
-    } else {
-      tmp = 0U;
-    }
-  } else {
-    tmp = MAX_uint8_T;
-  }
-
-  writeDigitalPin(22, tmp);
 
   /* MATLABSystem: '<Root>/Analog Input' */
   if (ACC_DW.obj.SampleTime != ACC_P.AnalogInput_SampleTime) {
@@ -509,7 +468,7 @@ void ACC_step(void)
   /* Gain: '<S3>/Gain' incorporates:
    *  MATLABSystem: '<Root>/Analog Input'
    * */
-  duration = (uint32_T)ACC_P.Gain_Gain_a * b_varargout_1;
+  duration = (uint32_T)ACC_P.Gain_Gain_f * b_varargout_1;
 
   /* Chart: '<S3>/Chart' incorporates:
    *  DataTypeConversion: '<S3>/Data Type Conversion2'
@@ -547,6 +506,10 @@ void ACC_step(void)
       if (rtb_state == 2) {
         ACC_DW.is_c1_ACC = ACC_IN_AccOn;
         rtb_Gain = (real_T)duration * 7.62939453125E-6;
+      } else if (rtb_state == 0) {
+        ACC_DW.is_c1_ACC = ACC_IN_AccOff;
+        ACC_DW.a = (real_T)duration * 7.62939453125E-6;
+        rtb_Gain = 0.0;
       } else {
         rtb_Gain = ACC_DW.a;
       }
@@ -557,7 +520,7 @@ void ACC_step(void)
   /* End of Chart: '<S3>/Chart' */
   if (ACC_M->Timing.TaskCounters.TID[1] == 0) {
     /* MATLABSystem: '<Root>/PWM' */
-    ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
+    ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
 
     /* If: '<S3>/If' incorporates:
      *  Constant: '<S3>/Constant'
@@ -566,9 +529,9 @@ void ACC_step(void)
      *  Product: '<S3>/Divide'
      */
     if (rtb_Merge == 1.0) {
-      rtb_Gain /= ACC_P.Constant1_Value_i;
+      rtb_Gain /= ACC_P.Constant1_Value_j;
     } else if (rtb_Merge == 2.0) {
-      rtb_Gain = ACC_P.Constant_Value_k;
+      rtb_Gain = ACC_P.Constant_Value_g;
     }
 
     rtb_Gain = floor(rtb_Gain);
@@ -585,11 +548,51 @@ void ACC_step(void)
     /* MATLABSystem: '<Root>/PWM' incorporates:
      *  DataTypeConversion: '<S3>/Data Type Conversion1'
      */
-    MW_PWM_SetDutyCycle(ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE, (real_T)
+    MW_PWM_SetDutyCycle(ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE, (real_T)
                         (rtb_Gain < 0.0 ? (int16_T)(uint8_T)-(int8_T)(uint8_T)
                          -rtb_Gain : (int16_T)(uint8_T)rtb_Gain));
   }
 
+  /* If: '<S2>/If5' incorporates:
+   *  Constant: '<S6>/Constant'
+   *  MATLABSystem: '<Root>/Digital Output4'
+   *  SignalConversion generated from: '<S5>/In1'
+   *  SignalConversion generated from: '<S7>/In1'
+   */
+  if (rtb_state == 1) {
+    /* Outputs for IfAction SubSystem: '<S2>/ACC standby2' incorporates:
+     *  ActionPort: '<S7>/ACC standby'
+     */
+    rtb_Gain = ACC_B.PulseGenerator6;
+
+    /* End of Outputs for SubSystem: '<S2>/ACC standby2' */
+  } else if (rtb_state == 2) {
+    rtb_Gain = ACC_P.Constant_Value_b;
+  } else {
+    /* Outputs for IfAction SubSystem: '<S2>/ACC off5' incorporates:
+     *  ActionPort: '<S5>/Action Port'
+     */
+    rtb_Gain = ACC_B.PulseGenerator7;
+
+    /* End of Outputs for SubSystem: '<S2>/ACC off5' */
+  }
+
+  rtb_Gain = rt_roundd_snf(rtb_Gain);
+
+  /* End of If: '<S2>/If5' */
+
+  /* MATLABSystem: '<Root>/Digital Output4' */
+  if (rtb_Gain < 256.0) {
+    if (rtb_Gain >= 0.0) {
+      tmp = (uint8_T)rtb_Gain;
+    } else {
+      tmp = 0U;
+    }
+  } else {
+    tmp = MAX_uint8_T;
+  }
+
+  writeDigitalPin(22, tmp);
   rate_scheduler();
 }
 
@@ -621,7 +624,7 @@ void ACC_initialize(void)
    *  Delay: '<S9>/Delay'
    *  Sum: '<S9>/Add'
    */
-  ACC_DW.Delay_DSTATE_l = ACC_P.sw1_Y0;
+  ACC_DW.Delay_DSTATE_m = ACC_P.sw1_Y0;
 
   /* Attach callback function */
   attachInterrupt(digitalPinToInterrupt(20), &MW_ISR_20, FALLING);
@@ -646,21 +649,15 @@ void ACC_initialize(void)
   /* End of SystemInitialize for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt6' */
 
   /* Start for MATLABSystem: '<Root>/Ultrasonic Sensor' */
-  ACC_DW.obj_ok.isInitialized = 1L;
+  ACC_DW.obj_i.isInitialized = 1L;
   MW_UltrasonicSetup(50, 51);
-  ACC_DW.obj_ok.TunablePropsChanged = false;
+  ACC_DW.obj_i.TunablePropsChanged = false;
 
   /* Start for MATLABSystem: '<Root>/Digital Output' */
-  ACC_DW.obj_o.matlabCodegenIsDeleted = false;
-  ACC_DW.obj_o.isInitialized = 1L;
+  ACC_DW.obj_n.matlabCodegenIsDeleted = false;
+  ACC_DW.obj_n.isInitialized = 1L;
   digitalIOSetup(23, 1);
-  ACC_DW.obj_o.isSetupComplete = true;
-
-  /* Start for MATLABSystem: '<Root>/Digital Output4' */
-  ACC_DW.obj_c.matlabCodegenIsDeleted = false;
-  ACC_DW.obj_c.isInitialized = 1L;
-  digitalIOSetup(22, 1);
-  ACC_DW.obj_c.isSetupComplete = true;
+  ACC_DW.obj_n.isSetupComplete = true;
 
   /* Start for MATLABSystem: '<Root>/Analog Input' */
   ACC_DW.obj.matlabCodegenIsDeleted = false;
@@ -670,28 +667,27 @@ void ACC_initialize(void)
   ACC_DW.obj.isSetupComplete = true;
 
   /* Start for MATLABSystem: '<Root>/PWM' */
-  ACC_DW.obj_a.matlabCodegenIsDeleted = false;
-  ACC_DW.obj_a.isInitialized = 1L;
-  ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL, 0.0, 0.0);
-  ACC_DW.obj_a.isSetupComplete = true;
+  ACC_DW.obj_f.matlabCodegenIsDeleted = false;
+  ACC_DW.obj_f.isInitialized = 1L;
+  ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL, 0.0, 0.0);
+  ACC_DW.obj_f.isSetupComplete = true;
+
+  /* Start for MATLABSystem: '<Root>/Digital Output4' */
+  ACC_DW.obj_h.matlabCodegenIsDeleted = false;
+  ACC_DW.obj_h.isInitialized = 1L;
+  digitalIOSetup(22, 1);
+  ACC_DW.obj_h.isSetupComplete = true;
 }
 
 /* Model terminate function */
 void ACC_terminate(void)
 {
   /* Terminate for MATLABSystem: '<Root>/Digital Output' */
-  if (!ACC_DW.obj_o.matlabCodegenIsDeleted) {
-    ACC_DW.obj_o.matlabCodegenIsDeleted = true;
+  if (!ACC_DW.obj_n.matlabCodegenIsDeleted) {
+    ACC_DW.obj_n.matlabCodegenIsDeleted = true;
   }
 
   /* End of Terminate for MATLABSystem: '<Root>/Digital Output' */
-
-  /* Terminate for MATLABSystem: '<Root>/Digital Output4' */
-  if (!ACC_DW.obj_c.matlabCodegenIsDeleted) {
-    ACC_DW.obj_c.matlabCodegenIsDeleted = true;
-  }
-
-  /* End of Terminate for MATLABSystem: '<Root>/Digital Output4' */
 
   /* Terminate for MATLABSystem: '<Root>/Analog Input' */
   if (!ACC_DW.obj.matlabCodegenIsDeleted) {
@@ -706,17 +702,24 @@ void ACC_terminate(void)
   /* End of Terminate for MATLABSystem: '<Root>/Analog Input' */
 
   /* Terminate for MATLABSystem: '<Root>/PWM' */
-  if (!ACC_DW.obj_a.matlabCodegenIsDeleted) {
-    ACC_DW.obj_a.matlabCodegenIsDeleted = true;
-    if ((ACC_DW.obj_a.isInitialized == 1L) && ACC_DW.obj_a.isSetupComplete) {
-      ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
-      MW_PWM_SetDutyCycle(ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE, 0.0);
-      ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
-      MW_PWM_Close(ACC_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE);
+  if (!ACC_DW.obj_f.matlabCodegenIsDeleted) {
+    ACC_DW.obj_f.matlabCodegenIsDeleted = true;
+    if ((ACC_DW.obj_f.isInitialized == 1L) && ACC_DW.obj_f.isSetupComplete) {
+      ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
+      MW_PWM_SetDutyCycle(ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
+      MW_PWM_Close(ACC_DW.obj_f.PWMDriverObj.MW_PWM_HANDLE);
     }
   }
 
   /* End of Terminate for MATLABSystem: '<Root>/PWM' */
+
+  /* Terminate for MATLABSystem: '<Root>/Digital Output4' */
+  if (!ACC_DW.obj_h.matlabCodegenIsDeleted) {
+    ACC_DW.obj_h.matlabCodegenIsDeleted = true;
+  }
+
+  /* End of Terminate for MATLABSystem: '<Root>/Digital Output4' */
 }
 
 /*
