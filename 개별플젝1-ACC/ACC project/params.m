@@ -7,3 +7,6 @@ US_trigger=50;
 US_echo=51;
 Potentiometer=8;
 Motor=11;
+Bright=9;
+RGB_LED=3;
+Buzzer=44;

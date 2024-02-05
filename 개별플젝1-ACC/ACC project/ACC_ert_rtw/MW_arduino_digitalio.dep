@@ -12,7 +12,7 @@ MW_arduino_digitalio.o: \
  C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/cores/arduino/Arduino.h \
  C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/variants/mega/pins_arduino.h \
  C:/PROGRA~3/MATLAB/SUPPOR~1/R2023b/toolbox/target/SUPPOR~1/ARDUIN~2/include/MW_arduino_digitalio.h \
- C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/1주차-~1/ACCPRO~1/ACC_ert_rtw/rtwtypes.h
+ C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/개별플~1/ACCPRO~1/ACC_ert_rtw/rtwtypes.h
 
 C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/cores/arduino/Arduino.h:
 
@@ -38,4 +38,4 @@ C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/variants/
 
 C:/PROGRA~3/MATLAB/SUPPOR~1/R2023b/toolbox/target/SUPPOR~1/ARDUIN~2/include/MW_arduino_digitalio.h:
 
-C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/1주차-~1/ACCPRO~1/ACC_ert_rtw/rtwtypes.h:
+C:/Users/tkdle/OneDrive/바탕화~1/SW-CAM~1/개별플~1/ACCPRO~1/ACC_ert_rtw/rtwtypes.h:

@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ACC'.
  *
- * Model version                  : 1.4
+ * Model version                  : 1.9
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb  3 22:36:17 2024
+ * C/C++ source code generated on : Mon Feb  5 10:17:43 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -20,10 +20,17 @@
 #ifndef RTW_HEADER_ACC_private_h_
 #define RTW_HEADER_ACC_private_h_
 #include "rtwtypes.h"
+#include "multiword_types.h"
 #include "ACC_types.h"
 #include "ACC.h"
 #include "rtw_continuous.h"
 #include "rtw_solver.h"
+
+/* Private macros used by the generated code to access rtModel */
+#ifndef rtmSetTFinal
+#define rtmSetTFinal(rtm, val)         ((rtm)->Timing.tFinal = (val))
+#endif
+
 #ifndef UCHAR_MAX
 #include <limits.h>
 #endif

@@ -7,7 +7,7 @@
 %endfunction
 %function ChartDataMap(block, system) void
   %createrecord ChartDataElements {\
-    NumChartData   3 \
+    NumChartData   4 \
     ChartDataDefaults {\
       RecordType   "ChartData"\
       Dimensions   []\
@@ -21,18 +21,27 @@
       SrcLocation  ""\
     }\
     ChartData {\
-      Name         "is_active_c1_ACC"\
-      Description  "StateIsActive"\
+      Name         "sfEvent"\
+      Description  "ActiveChartEvent"\
       SFName       ""\
       Path         ""\
       SrcLocation  ""\
     }\
     ChartData {\
+      Name         "is_active_c1_ACC"\
+      Description  "StateIsActive"\
+      SFName       "is_active_c1_ACC"\
+      Path         "is_active_c1_ACC"\
+      SrcLocation  ""\
+      IsTestPoint  1\
+    }\
+    ChartData {\
       Name         "is_c1_ACC"\
       Description  "StateActiveChild"\
-      SFName       ""\
-      Path         ""\
+      SFName       "is_c1_ACC"\
+      Path         "is_c1_ACC"\
       SrcLocation  ""\
+      IsTestPoint  1\
     }\
   }
   %return ChartDataElements

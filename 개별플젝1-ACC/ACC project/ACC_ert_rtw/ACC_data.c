@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ACC'.
  *
- * Model version                  : 1.4
+ * Model version                  : 1.9
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb  3 22:36:17 2024
+ * C/C++ source code generated on : Mon Feb  5 10:17:43 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -27,22 +27,7 @@ P_ACC_T ACC_P = {
   -1.0,
 
   /* Computed Parameter: sw1_Y0
-   * Referenced by: '<S9>/sw1'
-   */
-  0.0,
-
-  /* Expression: 1
-   * Referenced by: '<S9>/Constant'
-   */
-  1.0,
-
-  /* Expression: 0.0
-   * Referenced by: '<S9>/Delay'
-   */
-  0.0,
-
-  /* Computed Parameter: sw2_Y0
-   * Referenced by: '<S10>/sw2'
+   * Referenced by: '<S10>/sw1'
    */
   0.0,
 
@@ -56,8 +41,23 @@ P_ACC_T ACC_P = {
    */
   0.0,
 
+  /* Computed Parameter: sw2_Y0
+   * Referenced by: '<S11>/sw2'
+   */
+  0.0,
+
   /* Expression: 1
-   * Referenced by: '<S6>/Constant'
+   * Referenced by: '<S11>/Constant'
+   */
+  1.0,
+
+  /* Expression: 0.0
+   * Referenced by: '<S11>/Delay'
+   */
+  0.0,
+
+  /* Expression: 1
+   * Referenced by: '<S7>/Constant'
    */
   1.0,
 
@@ -163,6 +163,51 @@ P_ACC_T ACC_P = {
 
   /* Expression: 0
    * Referenced by: '<S3>/Constant'
+   */
+  0.0,
+
+  /* Expression: 0
+   * Referenced by: '<S5>/Constant'
+   */
+  0.0,
+
+  /* Expression: 1
+   * Referenced by: '<S5>/Pulse Generator'
+   */
+  1.0,
+
+  /* Computed Parameter: PulseGenerator_Period_p
+   * Referenced by: '<S5>/Pulse Generator'
+   */
+  2.0,
+
+  /* Computed Parameter: PulseGenerator_Duty_n
+   * Referenced by: '<S5>/Pulse Generator'
+   */
+  1.0,
+
+  /* Expression: 0
+   * Referenced by: '<S5>/Pulse Generator'
+   */
+  0.0,
+
+  /* Expression: 1
+   * Referenced by: '<S5>/Pulse Generator1'
+   */
+  1.0,
+
+  /* Computed Parameter: PulseGenerator1_Period
+   * Referenced by: '<S5>/Pulse Generator1'
+   */
+  2.0,
+
+  /* Computed Parameter: PulseGenerator1_Duty
+   * Referenced by: '<S5>/Pulse Generator1'
+   */
+  1.0,
+
+  /* Expression: 0
+   * Referenced by: '<S5>/Pulse Generator1'
    */
   0.0,
 
