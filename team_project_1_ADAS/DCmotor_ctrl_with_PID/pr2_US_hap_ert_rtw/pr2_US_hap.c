@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'pr2_US_hap'.
  *
- * Model version                  : 1.10
+ * Model version                  : 1.12
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Mon Feb 12 17:15:10 2024
+ * C/C++ source code generated on : Tue Feb 13 17:45:30 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -56,7 +56,6 @@ ExtY_pr2_US_hap_T pr2_US_hap_Y;
 /* Real-time model */
 static RT_MODEL_pr2_US_hap_T pr2_US_hap_M_;
 RT_MODEL_pr2_US_hap_T *const pr2_US_hap_M = &pr2_US_hap_M_;
-static void rate_monotonic_scheduler(void);
 void sMultiWordMul(const uint32_T u1[], int16_T n1, const uint32_T u2[], int16_T
                    n2, uint32_T y[], int16_T n)
 {
@@ -170,6 +169,57 @@ real_T sMultiWord2Double(const uint32_T u1[], int16_T n1, int16_T e1)
   }
 
   return y;
+}
+
+int32_T MultiWord2sLong(const uint32_T u[])
+{
+  return (int32_T)u[0];
+}
+
+void sMultiWordShr(const uint32_T u1[], int16_T n1, uint16_T n2, uint32_T y[],
+                   int16_T n)
+{
+  uint32_T u1i;
+  uint32_T yi;
+  uint32_T ys;
+  int16_T i;
+  int16_T i1;
+  int16_T nb;
+  int16_T nc;
+  uint16_T nr;
+  nb = (int16_T)(n2 >> 5);
+  i = 0;
+  ys = (u1[n1 - 1] & 2147483648UL) != 0UL ? MAX_uint32_T : 0UL;
+  if (nb < n1) {
+    nc = n + nb;
+    if (nc > n1) {
+      nc = n1;
+    }
+
+    nr = n2 - ((uint16_T)nb << 5);
+    if (nr > 0U) {
+      u1i = u1[nb];
+      for (i1 = nb + 1; i1 < nc; i1++) {
+        yi = u1i >> nr;
+        u1i = u1[i1];
+        y[i] = u1i << (32U - nr) | yi;
+        i++;
+      }
+
+      y[i] = (nc < n1 ? u1[nc] : ys) << (32U - nr) | u1i >> nr;
+      i++;
+    } else {
+      for (i1 = nb; i1 < nc; i1++) {
+        y[i] = u1[i1];
+        i++;
+      }
+    }
+  }
+
+  while (i < n) {
+    y[i] = ys;
+    i++;
+  }
 }
 
 void sMultiWordShl(const uint32_T u1[], int16_T n1, uint16_T n2, uint32_T y[],
@@ -669,57 +719,6 @@ int16_T sMultiWordCmp(const uint32_T u1[], const uint32_T u2[], int16_T n)
   return y;
 }
 
-int32_T MultiWord2sLong(const uint32_T u[])
-{
-  return (int32_T)u[0];
-}
-
-void sMultiWordShr(const uint32_T u1[], int16_T n1, uint16_T n2, uint32_T y[],
-                   int16_T n)
-{
-  uint32_T u1i;
-  uint32_T yi;
-  uint32_T ys;
-  int16_T i;
-  int16_T i1;
-  int16_T nb;
-  int16_T nc;
-  uint16_T nr;
-  nb = (int16_T)(n2 >> 5);
-  i = 0;
-  ys = (u1[n1 - 1] & 2147483648UL) != 0UL ? MAX_uint32_T : 0UL;
-  if (nb < n1) {
-    nc = n + nb;
-    if (nc > n1) {
-      nc = n1;
-    }
-
-    nr = n2 - ((uint16_T)nb << 5);
-    if (nr > 0U) {
-      u1i = u1[nb];
-      for (i1 = nb + 1; i1 < nc; i1++) {
-        yi = u1i >> nr;
-        u1i = u1[i1];
-        y[i] = u1i << (32U - nr) | yi;
-        i++;
-      }
-
-      y[i] = (nc < n1 ? u1[nc] : ys) << (32U - nr) | u1i >> nr;
-      i++;
-    } else {
-      for (i1 = nb; i1 < nc; i1++) {
-        y[i] = u1[i1];
-        i++;
-      }
-    }
-  }
-
-  while (i < n) {
-    y[i] = ys;
-    i++;
-  }
-}
-
 /* Callback for Hardware Interrupt Block: '<Root>/External Interrupt(SW1)' */
 void MW_ISR_2(void)
 {
@@ -734,24 +733,24 @@ void MW_ISR_2(void)
 
     /* Asynchronous task (with no priority assigned)
      * reads absolute time */
-    switch (pr2_US_hap_M->Timing.rtmDbBufWriteBuf3) {
+    switch (pr2_US_hap_M->Timing.rtmDbBufWriteBuf2) {
      case 0:
-      pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 1;
+      pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 1;
       break;
 
      case 1:
-      pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 0;
+      pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 0;
       break;
 
      default:
-      pr2_US_hap_M->Timing.rtmDbBufReadBuf3 =
-        pr2_US_hap_M->Timing.rtmDbBufLastBufWr3;
+      pr2_US_hap_M->Timing.rtmDbBufReadBuf2 =
+        pr2_US_hap_M->Timing.rtmDbBufLastBufWr2;
       break;
     }
 
-    pr2_US_hap_M->Timing.clockTick3 = pr2_US_hap_M->
-      Timing.rtmDbBufClockTick3[pr2_US_hap_M->Timing.rtmDbBufReadBuf3];
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 0xFF;
+    pr2_US_hap_M->Timing.clockTick2 = pr2_US_hap_M->
+      Timing.rtmDbBufClockTick2[pr2_US_hap_M->Timing.rtmDbBufReadBuf2];
+    pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 0xFF;
 
     /* Sum: '<S1>/Add' incorporates:
      *  Constant: '<S1>/Constant'
@@ -794,6 +793,34 @@ void MW_ISR_2(void)
 
     /* End of RateTransition generated from: '<S3>/Chart' */
 
+    /* RateTransition generated from: '<S3>/Display' */
+    switch (pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf) {
+     case 0:
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu = 1;
+      break;
+
+     case 1:
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu = 0;
+      break;
+
+     default:
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu = (int8_T)
+        (pr2_US_hap_DW.TmpRTBAtDisplayInport1_last_buf == 0);
+      break;
+    }
+
+    if (pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu != 0) {
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_Buffer1 = pr2_US_hap_B.Add_h;
+    } else {
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_Buffer0 = pr2_US_hap_B.Add_h;
+    }
+
+    pr2_US_hap_DW.TmpRTBAtDisplayInport1_last_buf =
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu;
+    pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu = -1;
+
+    /* End of RateTransition generated from: '<S3>/Display' */
+
     /* RateTransition generated from: '<Root>/Display2' */
     switch (pr2_US_hap_DW.TmpRTBAtDisplay2Inport1_read_bu) {
      case 0:
@@ -823,173 +850,7 @@ void MW_ISR_2(void)
     /* End of RateTransition generated from: '<Root>/Display2' */
   }
 
-  extmodeEvent(3,((pr2_US_hap_M->Timing.clockTick3) * 0.01));
-}
-
-/* Callback for Hardware Interrupt Block: '<Root>/External Interrupt(SW2)' */
-void MW_ISR_3(void)
-{
-  /* Call the system: <Root>/SW1 PUSH1 */
-  {
-    /* Reset subsysRan breadcrumbs */
-    srClearBC(pr2_US_hap_DW.SW1PUSH1_SubsysRanBC);
-
-    /* S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW2)' */
-
-    /* Output and update for function-call system: '<Root>/SW1 PUSH1' */
-
-    /* Asynchronous task (with no priority assigned)
-     * reads absolute time */
-    switch (pr2_US_hap_M->Timing.rtmDbBufWriteBuf4) {
-     case 0:
-      pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 1;
-      break;
-
-     case 1:
-      pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 0;
-      break;
-
-     default:
-      pr2_US_hap_M->Timing.rtmDbBufReadBuf4 =
-        pr2_US_hap_M->Timing.rtmDbBufLastBufWr4;
-      break;
-    }
-
-    pr2_US_hap_M->Timing.clockTick4 = pr2_US_hap_M->
-      Timing.rtmDbBufClockTick4[pr2_US_hap_M->Timing.rtmDbBufReadBuf4];
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 0xFF;
-
-    /* Sum: '<S2>/Add' incorporates:
-     *  Constant: '<S2>/Constant'
-     *  Delay: '<S2>/Delay'
-     */
-    pr2_US_hap_B.Add = pr2_US_hap_P.Constant_Value_f -
-      pr2_US_hap_DW.Delay_DSTATE;
-
-    /* Update for Delay: '<S2>/Delay' */
-    pr2_US_hap_DW.Delay_DSTATE = pr2_US_hap_B.Add;
-    pr2_US_hap_DW.SW1PUSH1_SubsysRanBC = 4;
-
-    /* End of Outputs for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW2)' */
-
-    /* RateTransition generated from: '<S3>/Chart1' */
-    switch (pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf) {
-     case 0:
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf = 1;
-      break;
-
-     case 1:
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf = 0;
-      break;
-
-     default:
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf = (int8_T)
-        (pr2_US_hap_DW.TmpRTBAtChart1Inport1_last_buf_ == 0);
-      break;
-    }
-
-    if (pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf != 0) {
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_Buffer1 = pr2_US_hap_B.Add;
-    } else {
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_Buffer0 = pr2_US_hap_B.Add;
-    }
-
-    pr2_US_hap_DW.TmpRTBAtChart1Inport1_last_buf_ =
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf;
-    pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf = -1;
-
-    /* End of RateTransition generated from: '<S3>/Chart1' */
-
-    /* RateTransition generated from: '<S3>/Chart' */
-    switch (pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf) {
-     case 0:
-      pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf = 1;
-      break;
-
-     case 1:
-      pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf = 0;
-      break;
-
-     default:
-      pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf = (int8_T)
-        (pr2_US_hap_DW.TmpRTBAtChartInport2_last_buf_w == 0);
-      break;
-    }
-
-    if (pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf != 0) {
-      pr2_US_hap_DW.TmpRTBAtChartInport2_Buffer1 = pr2_US_hap_B.Add;
-    } else {
-      pr2_US_hap_DW.TmpRTBAtChartInport2_Buffer0 = pr2_US_hap_B.Add;
-    }
-
-    pr2_US_hap_DW.TmpRTBAtChartInport2_last_buf_w =
-      pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf;
-    pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf = -1;
-
-    /* End of RateTransition generated from: '<S3>/Chart' */
-
-    /* RateTransition generated from: '<Root>/Display3' */
-    switch (pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu) {
-     case 0:
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b = 1;
-      break;
-
-     case 1:
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b = 0;
-      break;
-
-     default:
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b = (int8_T)
-        (pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_last_bu == 0);
-      break;
-    }
-
-    if (pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b != 0) {
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_Buffer1 = pr2_US_hap_B.Add;
-    } else {
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_Buffer0 = pr2_US_hap_B.Add;
-    }
-
-    pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_last_bu =
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b;
-    pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b = -1;
-
-    /* End of RateTransition generated from: '<Root>/Display3' */
-  }
-
-  extmodeEvent(4,((pr2_US_hap_M->Timing.clockTick4) * 0.01));
-}
-
-/*
- * Set which subrates need to run this base step (base rate always runs).
- * This function must be called prior to calling the model step function
- * in order to remember which rates need to run this base step.  The
- * buffering of events allows for overlapping preemption.
- */
-void pr2_US_hap_SetEventsForThisBaseStep(boolean_T *eventFlags)
-{
-  /* Task runs when its counter is zero, computed via rtmStepTask macro */
-  eventFlags[2] = ((boolean_T)rtmStepTask(pr2_US_hap_M, 2));
-}
-
-/*
- *         This function updates active task flag for each subrate
- *         and rate transition flags for tasks that exchange data.
- *         The function assumes rate-monotonic multitasking scheduler.
- *         The function must be called at model base rate so that
- *         the generated code self-manages all its subrates and rate
- *         transition flags.
- */
-static void rate_monotonic_scheduler(void)
-{
-  /* Compute which subrates run during the next base time step.  Subrates
-   * are an integer multiple of the base rate counter.  Therefore, the subtask
-   * counter is reset when it reaches its limit (zero means run).
-   */
-  (pr2_US_hap_M->Timing.TaskCounters.TID[2])++;
-  if ((pr2_US_hap_M->Timing.TaskCounters.TID[2]) > 9) {/* Sample time: [0.1s, 0.0s] */
-    pr2_US_hap_M->Timing.TaskCounters.TID[2] = 0;
-  }
+  extmodeEvent(2,((pr2_US_hap_M->Timing.clockTick2) * 0.01));
 }
 
 /*
@@ -1022,7 +883,7 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
   real_T *f2 = id->f[2];
   real_T hB[3];
   int_T i;
-  int_T nXc = 1;
+  int_T nXc = 2;
   rtsiSetSimTimeStep(si,MINOR_TIME_STEP);
 
   /* Save the state values at time t in y, we'll use x as ynew. */
@@ -1042,7 +903,7 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 
   rtsiSetT(si, t + h*rt_ODE3_A[0]);
   rtsiSetdX(si, f1);
-  pr2_US_hap_step0();
+  pr2_US_hap_step();
   pr2_US_hap_derivatives();
 
   /* f(:,3) = feval(odefile, t + hA(2), y + f*hB(:,2), args(:)(*)); */
@@ -1056,7 +917,7 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 
   rtsiSetT(si, t + h*rt_ODE3_A[1]);
   rtsiSetdX(si, f2);
-  pr2_US_hap_step0();
+  pr2_US_hap_step();
   pr2_US_hap_derivatives();
 
   /* tnew = t + hA(3);
@@ -1073,20 +934,26 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
   rtsiSetSimTimeStep(si,MAJOR_TIME_STEP);
 }
 
-/* Model step function for TID0 */
-void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
+/* System initialize for function-call system: '<Root>/SW1 PUSH1' */
+void pr2_US_hap_SW1PUSH1_Init(void)
+{
+  /* SystemInitialize for Sum: '<S2>/Add' incorporates:
+   *  Outport: '<S2>/sw1'
+   */
+  pr2_US_hap_B.Add = pr2_US_hap_P.sw1_Y0_e;
+}
+
+/* Model step function */
+void pr2_US_hap_step(void)
 {
   /* local block i/o variables */
   int32_T rtb_TSamp;
+  int32_T rtb_TSamp_f;
   if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
     /* set solver stop time */
     rtsiSetSolverStopTime(&pr2_US_hap_M->solverInfo,
                           ((pr2_US_hap_M->Timing.clockTick0+1)*
       pr2_US_hap_M->Timing.stepSize0));
-
-    {                                  /* Sample time: [0.0s, 0.0s] */
-      rate_monotonic_scheduler();
-    }
   }                                    /* end MajorTimeStep */
 
   /* Update absolute time of base rate at minor time step */
@@ -1095,51 +962,24 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
   }
 
   {
+    int64m_T tmp_3;
     real_T rtb_Add1;
-    real_T rtb_Gain1;
+    real_T rtb_Add1_m;
+    real_T tmp_0;
+    real_T *lastU;
     int32_T tmp;
-    uint32_T tmp_0;
     uint32_T tmp_1;
+    uint32_T tmp_2;
     uint16_T b_varargout_1;
-    static const int64m_T tmp_2 = { { 0UL, 0UL }/* chunks */
+    static const int64m_T tmp_4 = { { 0UL, 0UL }/* chunks */
     };
 
-    /* Integrator: '<S6>/Integrator1' */
-    rtb_Gain1 = pr2_US_hap_X.Integrator1_CSTATE;
+    static const int64m_T tmp_5 = { { 25UL, 0UL }/* chunks */
+    };
 
-    /* S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW1)' */
-    /* S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW2)' */
+    /* Integrator: '<S10>/Integrator2' */
+    pr2_US_hap_B.Derivative2 = pr2_US_hap_X.Integrator2_CSTATE;
     if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
-      /* RateTransition generated from: '<S3>/Chart1' */
-      switch (pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf) {
-       case 0:
-        pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf = 1;
-        break;
-
-       case 1:
-        pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf = 0;
-        break;
-
-       default:
-        pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf =
-          pr2_US_hap_DW.TmpRTBAtChart1Inport1_last_buf_;
-        break;
-      }
-
-      if (pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf != 0) {
-        /* RateTransition generated from: '<S3>/Chart1' */
-        pr2_US_hap_B.TmpRTBAtChart1Inport1 =
-          pr2_US_hap_DW.TmpRTBAtChart1Inport1_Buffer1;
-      } else {
-        /* RateTransition generated from: '<S3>/Chart1' */
-        pr2_US_hap_B.TmpRTBAtChart1Inport1 =
-          pr2_US_hap_DW.TmpRTBAtChart1Inport1_Buffer0;
-      }
-
-      pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf = -1;
-
-      /* End of RateTransition generated from: '<S3>/Chart1' */
-
       /* RateTransition generated from: '<S3>/Chart' */
       switch (pr2_US_hap_DW.TmpRTBAtChartInport1_write_buf) {
        case 0:
@@ -1170,48 +1010,12 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
 
       /* End of RateTransition generated from: '<S3>/Chart' */
 
-      /* RateTransition generated from: '<S3>/Chart' */
-      switch (pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf) {
-       case 0:
-        pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf = 1;
-        break;
-
-       case 1:
-        pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf = 0;
-        break;
-
-       default:
-        pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf =
-          pr2_US_hap_DW.TmpRTBAtChartInport2_last_buf_w;
-        break;
-      }
-
-      if (pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf != 0) {
-        /* RateTransition generated from: '<S3>/Chart' */
-        pr2_US_hap_B.TmpRTBAtChartInport2 =
-          pr2_US_hap_DW.TmpRTBAtChartInport2_Buffer1;
-      } else {
-        /* RateTransition generated from: '<S3>/Chart' */
-        pr2_US_hap_B.TmpRTBAtChartInport2 =
-          pr2_US_hap_DW.TmpRTBAtChartInport2_Buffer0;
-      }
-
-      pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf = -1;
-
-      /* End of RateTransition generated from: '<S3>/Chart' */
-
       /* Constant: '<Root>/Constant3' */
-      pr2_US_hap_B.Constant3 = pr2_US_hap_P.Constant3_Value;
-
-      /* Constant: '<Root>/Constant' */
-      pr2_US_hap_B.Constant = pr2_US_hap_P.Constant_Value_n;
+      pr2_US_hap_B.Constant3 = pr2_US_hap_P.f;
 
       /* Constant: '<Root>/Constant1' */
-      pr2_US_hap_B.Constant1 = pr2_US_hap_P.Constant1_Value;
+      pr2_US_hap_B.Constant1 = pr2_US_hap_P.r;
     }
-
-    /* End of Outputs for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW2)' */
-    /* End of Outputs for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW1)' */
 
     /* MATLABSystem: '<Root>/가변저항' */
     if (pr2_US_hap_DW.obj_n.SampleTime != pr2_US_hap_P._SampleTime) {
@@ -1219,122 +1023,128 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
     }
 
     pr2_US_hap_DW.obj_n.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-      MW_AnalogIn_GetHandle(54UL);
+      MW_AnalogIn_GetHandle(62UL);
     MW_AnalogInSingle_ReadResult
       (pr2_US_hap_DW.obj_n.AnalogInDriverObj.MW_ANALOGIN_HANDLE, &b_varargout_1,
        MW_ANALOGIN_UINT16);
 
     /* DataTypeConversion: '<S3>/Data Type Conversion' incorporates:
-     *  Gain: '<S3>/Gain4'
+     *  Gain: '<S3>/Gain'
      *  MATLABSystem: '<Root>/가변저항'
      * */
-    pr2_US_hap_B.DataTypeConversion = (real_T)((uint32_T)pr2_US_hap_P.Gain4_Gain
-      * b_varargout_1) * 7.62939453125E-6;
+    pr2_US_hap_B.DataTypeConversion = (real_T)((uint32_T)pr2_US_hap_P.Gain_Gain *
+      b_varargout_1) * 7.62939453125E-6;
     if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
       /* Chart: '<S3>/Chart' */
-      if (pr2_US_hap_DW.is_active_c3_pr2_US_hap == 0U) {
-        pr2_US_hap_DW.is_active_c3_pr2_US_hap = 1U;
-        pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_off;
+      if (pr2_US_hap_DW.is_active_c2_pr2_US_hap == 0U) {
+        pr2_US_hap_DW.is_active_c2_pr2_US_hap = 1U;
+        pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_off;
         pr2_US_hap_B.out1 = 0.0;
         pr2_US_hap_B.out2 = 0.0;
-        pr2_US_hap_DW.steering = 12.8;
-        pr2_US_hap_DW.default_k = 128.0;
+        pr2_US_hap_DW.steering = 0.02;
+        pr2_US_hap_DW.default_i = 360.0;
       } else {
-        switch (pr2_US_hap_DW.is_c3_pr2_US_hap) {
+        switch (pr2_US_hap_DW.is_c2_pr2_US_hap) {
          case pr2_US_hap_IN_drive_off:
           if (pr2_US_hap_B.TmpRTBAtChartInport1 == 1.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
+            pr2_US_hap_B.out1 = ((pr2_US_hap_B.DataTypeConversion - 128.0) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((128.0 - pr2_US_hap_B.DataTypeConversion) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
           } else {
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
-            pr2_US_hap_DW.steering = 12.8;
-            pr2_US_hap_DW.default_k = 128.0;
+            pr2_US_hap_DW.steering = 0.02;
+            pr2_US_hap_DW.default_i = 360.0;
           }
           break;
 
          case pr2_US_hap_IN_drive_on_adas_off:
           if (pr2_US_hap_B.TmpRTBAtChartInport1 == 0.0) {
             pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_off;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_off;
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
-            pr2_US_hap_DW.steering = 12.8;
-            pr2_US_hap_DW.default_k = 128.0;
-          } else if (pr2_US_hap_B.TmpRTBAtChartInport2 == 1.0) {
-            pr2_US_hap_DW.default_k = 128.0;
+            pr2_US_hap_DW.steering = 0.02;
+            pr2_US_hap_DW.default_i = 360.0;
+          } else if (pr2_US_hap_B.Add == 1.0) {
             pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_on;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_on;
+            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_i;
           } else {
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
+            pr2_US_hap_B.out1 = ((pr2_US_hap_B.DataTypeConversion - 128.0) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((128.0 - pr2_US_hap_B.DataTypeConversion) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
           }
           break;
 
          case pr2_US_hap_IN_drive_on_adas_on:
-          if (pr2_US_hap_B.TmpRTBAtChartInport2 == 0.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
+          if (pr2_US_hap_B.Add == 0.0) {
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
+            pr2_US_hap_B.out1 = ((pr2_US_hap_B.DataTypeConversion - 128.0) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((128.0 - pr2_US_hap_B.DataTypeConversion) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
           } else if (pr2_US_hap_B.Constant3 <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
             pr2_US_hap_B.buzzer = 1.0;
           } else if (pr2_US_hap_B.Constant1 <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_RUS;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - (10.0 -
-              pr2_US_hap_B.Constant1) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out2 = (10.0 - pr2_US_hap_B.Constant1) *
-              pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
-          } else if (pr2_US_hap_B.Constant <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_LUS;
-            rtb_Add1 = (10.0 - pr2_US_hap_B.Constant) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out1 = rtb_Add1 + pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k - rtb_Add1;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_RUS;
+            pr2_US_hap_B.out1 = (1.0 - (10.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((10.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
           } else {
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_LUS;
+            pr2_US_hap_B.out1 = (10.0 * pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = (1.0 - 10.0 * pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
           }
           break;
 
          case pr2_US__IN_drive_on_adas_on_FUS:
-          if ((pr2_US_hap_B.Constant > 10.0) && (pr2_US_hap_B.Constant1 > 10.0) &&
-              (pr2_US_hap_B.Constant3 > 10.0)) {
+          if ((pr2_US_hap_B.Constant1 <= 10.0) && (pr2_US_hap_B.Constant3 > 10.0))
+          {
             pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_on;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k;
-          } else if ((pr2_US_hap_B.Constant <= 10.0) && (pr2_US_hap_B.Constant1 <=
-                      10.0) && (pr2_US_hap_B.Constant3 > 10.0)) {
-            pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_IN_drive_on_adas_on_LRUS;
-            rtb_Add1 = (pr2_US_hap_B.Constant - pr2_US_hap_B.Constant1) *
-              pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - rtb_Add1;
-            pr2_US_hap_B.out2 = rtb_Add1 + pr2_US_hap_DW.default_k;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_IN_drive_on_adas_on_LRUS;
+            pr2_US_hap_B.out1 = (1.0 - (0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
           } else if ((pr2_US_hap_B.Constant1 <= 10.0) && (pr2_US_hap_B.Constant3
                       > 10.0)) {
             pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_RUS;
-            rtb_Add1 = (10.0 - pr2_US_hap_B.Constant1) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - rtb_Add1;
-            pr2_US_hap_B.out2 = rtb_Add1 + pr2_US_hap_DW.default_k;
-          } else if ((pr2_US_hap_B.Constant <= 10.0) && (pr2_US_hap_B.Constant3 >
-                      10.0)) {
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_RUS;
+            pr2_US_hap_B.out1 = (1.0 - (10.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((10.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
+          } else if (pr2_US_hap_B.Constant3 > 10.0) {
             pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_LUS;
-            rtb_Add1 = (10.0 - pr2_US_hap_B.Constant) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out1 = rtb_Add1 + pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k - rtb_Add1;
-          } else if (pr2_US_hap_B.TmpRTBAtChartInport2 == 0.0) {
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_LUS;
+            pr2_US_hap_B.out1 = (10.0 * pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = (1.0 - 10.0 * pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+          } else if (pr2_US_hap_B.Add == 0.0) {
             pr2_US_hap_B.buzzer = 0.0;
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
+            pr2_US_hap_B.out1 = ((pr2_US_hap_B.DataTypeConversion - 128.0) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((128.0 - pr2_US_hap_B.DataTypeConversion) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
           } else {
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
@@ -1344,89 +1154,79 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
 
          case pr2_US_IN_drive_on_adas_on_LRUS:
           if (pr2_US_hap_B.Constant3 <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
             pr2_US_hap_B.buzzer = 1.0;
           } else if (pr2_US_hap_B.Constant1 > 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_LUS;
-            pr2_US_hap_B.out1 = (10.0 - pr2_US_hap_B.Constant) *
-              pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k - (10.0 -
-              pr2_US_hap_B.Constant) * pr2_US_hap_DW.steering;
-          } else if (pr2_US_hap_B.Constant > 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_RUS;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - (10.0 -
-              pr2_US_hap_B.Constant1) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out2 = (10.0 - pr2_US_hap_B.Constant1) *
-              pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
-          } else if (pr2_US_hap_B.TmpRTBAtChartInport2 == 0.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_LUS;
+            pr2_US_hap_B.out1 = (10.0 * pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = (1.0 - 10.0 * pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+          } else if (pr2_US_hap_B.Add == 0.0) {
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
+            pr2_US_hap_B.out1 = ((pr2_US_hap_B.DataTypeConversion - 128.0) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((128.0 - pr2_US_hap_B.DataTypeConversion) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
           } else {
-            rtb_Add1 = pr2_US_hap_B.Constant - pr2_US_hap_B.Constant1;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - rtb_Add1 *
-              pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out2 = rtb_Add1 * pr2_US_hap_DW.steering +
-              pr2_US_hap_DW.default_k;
+            pr2_US_hap_B.out1 = (1.0 - (0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
           }
           break;
 
          case pr2_US__IN_drive_on_adas_on_LUS:
-          if (pr2_US_hap_B.Constant > 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_on;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k;
-          } else if (pr2_US_hap_B.Constant1 <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_IN_drive_on_adas_on_LRUS;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - (pr2_US_hap_B.Constant
-              - pr2_US_hap_B.Constant1) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out2 = (pr2_US_hap_B.Constant - pr2_US_hap_B.Constant1)
-              * pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
+          if (pr2_US_hap_B.Constant1 <= 10.0) {
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_IN_drive_on_adas_on_LRUS;
+            pr2_US_hap_B.out1 = (1.0 - (0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
           } else if (pr2_US_hap_B.Constant3 <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
             pr2_US_hap_B.buzzer = 1.0;
-          } else if (pr2_US_hap_B.TmpRTBAtChartInport2 == 0.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
+          } else if (pr2_US_hap_B.Add == 0.0) {
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
+            pr2_US_hap_B.out1 = ((pr2_US_hap_B.DataTypeConversion - 128.0) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((128.0 - pr2_US_hap_B.DataTypeConversion) / 6.4
+                                 / 100.0 + 1.0) * pr2_US_hap_DW.default_i;
           } else {
-            pr2_US_hap_B.out1 = (10.0 - pr2_US_hap_B.Constant) *
-              pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k - (10.0 -
-              pr2_US_hap_B.Constant) * pr2_US_hap_DW.steering;
+            pr2_US_hap_B.out1 = (10.0 * pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = (1.0 - 10.0 * pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
           }
           break;
 
          default:
           /* case IN_drive_on_adas_on_RUS: */
           if (pr2_US_hap_B.Constant1 > 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_on;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k;
-            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_k;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_on;
+            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = pr2_US_hap_DW.default_i;
           } else if (pr2_US_hap_B.Constant3 <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US__IN_drive_on_adas_on_FUS;
             pr2_US_hap_B.out1 = 0.0;
             pr2_US_hap_B.out2 = 0.0;
             pr2_US_hap_B.buzzer = 1.0;
-          } else if (pr2_US_hap_B.Constant <= 10.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_IN_drive_on_adas_on_LRUS;
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - (pr2_US_hap_B.Constant
-              - pr2_US_hap_B.Constant1) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out2 = (pr2_US_hap_B.Constant - pr2_US_hap_B.Constant1)
-              * pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
-          } else if (pr2_US_hap_B.TmpRTBAtChartInport2 == 0.0) {
-            pr2_US_hap_DW.is_c3_pr2_US_hap = pr2_US_hap_IN_drive_on_adas_off;
-            pr2_US_hap_B.out1 = pr2_US_hap_B.DataTypeConversion;
-            pr2_US_hap_B.out2 = 256.0 - pr2_US_hap_B.DataTypeConversion;
           } else {
-            pr2_US_hap_B.out1 = pr2_US_hap_DW.default_k - (10.0 -
-              pr2_US_hap_B.Constant1) * pr2_US_hap_DW.steering;
-            pr2_US_hap_B.out2 = (10.0 - pr2_US_hap_B.Constant1) *
-              pr2_US_hap_DW.steering + pr2_US_hap_DW.default_k;
+            pr2_US_hap_DW.is_c2_pr2_US_hap = pr2_US_IN_drive_on_adas_on_LRUS;
+            pr2_US_hap_B.out1 = (1.0 - (0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering) *
+              pr2_US_hap_DW.default_i;
+            pr2_US_hap_B.out2 = ((0.0 - pr2_US_hap_B.Constant1) *
+                                 pr2_US_hap_DW.steering + 1.0) *
+              pr2_US_hap_DW.default_i;
           }
           break;
         }
@@ -1435,46 +1235,38 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
       /* End of Chart: '<S3>/Chart' */
 
       /* Constant: '<Root>/Constant2' */
-      pr2_US_hap_B.Constant2 = pr2_US_hap_P.Constant2_Value;
+      pr2_US_hap_B.Constant2 = pr2_US_hap_P.b;
 
       /* Chart: '<S3>/Chart1' */
-      if (pr2_US_hap_DW.is_active_c1_pr2_US_hap == 0U) {
-        pr2_US_hap_DW.is_active_c1_pr2_US_hap = 1U;
-        pr2_US_hap_DW.is_c1_pr2_US_hap = pr2_US_hap_IN_adas_off;
-
-        /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-        pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+      if (pr2_US_hap_DW.is_active_c5_pr2_US_hap == 0U) {
+        pr2_US_hap_DW.is_active_c5_pr2_US_hap = 1U;
+        pr2_US_hap_DW.is_c5_pr2_US_hap = pr2_US_hap_IN_adas_off;
+        pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
         pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
       } else {
-        switch (pr2_US_hap_DW.is_c1_pr2_US_hap) {
+        switch (pr2_US_hap_DW.is_c5_pr2_US_hap) {
          case pr2_US_hap_IN_adas_off:
-          if (pr2_US_hap_B.TmpRTBAtChart1Inport1 == 1.0) {
-            pr2_US_hap_DW.is_c1_pr2_US_hap = pr2_US_hap_IN_adas_on;
-
-            /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+          if (pr2_US_hap_B.Add == 1.0) {
+            pr2_US_hap_DW.is_c5_pr2_US_hap = pr2_US_hap_IN_adas_on;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
             pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
           } else {
-            /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
             pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
           }
           break;
 
          case pr2_US_hap_IN_adas_on:
-          if (pr2_US_hap_B.TmpRTBAtChart1Inport1 == 0.0) {
-            pr2_US_hap_DW.is_c1_pr2_US_hap = pr2_US_hap_IN_adas_off;
-
-            /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+          if (pr2_US_hap_B.Add == 0.0) {
+            pr2_US_hap_DW.is_c5_pr2_US_hap = pr2_US_hap_IN_adas_off;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
             pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
           } else if (pr2_US_hap_B.Constant2 <= 10.0) {
-            pr2_US_hap_DW.is_c1_pr2_US_hap = pr2_US_hap_IN_adas_on_BUS;
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1 * 1.2;
-            pr2_US_hap_B.rout2 = pr2_US_hap_B.DataTypeConversion1;
+            pr2_US_hap_DW.is_c5_pr2_US_hap = pr2_US_hap_IN_adas_on_BUS;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1 * 1.2;
+            pr2_US_hap_B.rout2 = pr2_US_hap_B.out2 * 1.2;
           } else {
-            /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
             pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
           }
           break;
@@ -1482,20 +1274,16 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
          default:
           /* case IN_adas_on_BUS: */
           if (pr2_US_hap_B.Constant2 > 10.0) {
-            pr2_US_hap_DW.is_c1_pr2_US_hap = pr2_US_hap_IN_adas_on;
-
-            /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+            pr2_US_hap_DW.is_c5_pr2_US_hap = pr2_US_hap_IN_adas_on;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
             pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
-          } else if (pr2_US_hap_B.TmpRTBAtChart1Inport1 == 0.0) {
-            pr2_US_hap_DW.is_c1_pr2_US_hap = pr2_US_hap_IN_adas_off;
-
-            /* DataTypeConversion: '<Root>/Data Type Conversion1' */
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1;
+          } else if (pr2_US_hap_B.Add == 0.0) {
+            pr2_US_hap_DW.is_c5_pr2_US_hap = pr2_US_hap_IN_adas_off;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1;
             pr2_US_hap_B.rout2 = pr2_US_hap_B.out2;
           } else {
-            pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.out1 * 1.2;
-            pr2_US_hap_B.rout2 = pr2_US_hap_B.DataTypeConversion1;
+            pr2_US_hap_B.rout1 = pr2_US_hap_B.out1 * 1.2;
+            pr2_US_hap_B.rout2 = pr2_US_hap_B.out2 * 1.2;
           }
           break;
         }
@@ -1503,110 +1291,257 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
 
       /* End of Chart: '<S3>/Chart1' */
 
-      /* DiscreteTransferFcn: '<S4>/Discrete Transfer Fcn' */
-      pr2_US_hap_B.DiscreteTransferFcn = tmp_2;
+      /* DiscreteTransferFcn: '<S8>/Discrete Transfer Fcn' */
+      pr2_US_hap_B.DiscreteTransferFcn = tmp_4;
 
-      /* DiscreteTransferFcn: '<S4>/Discrete Transfer Fcn' */
-      tmp_0 = (uint32_T)pr2_US_hap_P.num_Gd[1L];
-      tmp_1 = (uint32_T)pr2_US_hap_DW.DiscreteTransferFcn_states;
-      sMultiWordMul(&tmp_0, 1, &tmp_1, 1,
+      /* DiscreteTransferFcn: '<S8>/Discrete Transfer Fcn' */
+      tmp_1 = (uint32_T)pr2_US_hap_P.num_Gd[1L];
+      tmp_2 = (uint32_T)pr2_US_hap_DW.DiscreteTransferFcn_states;
+      sMultiWordMul(&tmp_1, 1, &tmp_2, 1,
                     &pr2_US_hap_B.DiscreteTransferFcn.chunks[0U], 2);
 
-      /* Sum: '<Root>/Add1' incorporates:
-       *  DiscreteTransferFcn: '<S4>/Discrete Transfer Fcn'
+      /* Sum: '<S4>/Add1' incorporates:
+       *  DiscreteTransferFcn: '<S8>/Discrete Transfer Fcn'
        */
-      rtb_Add1 = pr2_US_hap_B.DataTypeConversion1 - sMultiWord2Double
+      rtb_Add1 = pr2_US_hap_B.rout1 - sMultiWord2Double
         (&pr2_US_hap_B.DiscreteTransferFcn.chunks[0U], 2, 0) *
         1.1641532182693481E-10;
 
-      /* Gain: '<S6>/Gain5' */
-      pr2_US_hap_B.Gain5 = pr2_US_hap_P.KP * rtb_Add1;
+      /* Gain: '<S10>/Gain2' */
+      pr2_US_hap_B.Gain2_gz = pr2_US_hap_P.KP * rtb_Add1;
+
+      /* Gain: '<S10>/Gain3' */
+      pr2_US_hap_B.Gain3 = pr2_US_hap_P.KD * rtb_Add1;
     }
 
-    /* Sum: '<S6>/Subtract1' */
-    pr2_US_hap_B.Subtract1 = rtb_Gain1 + pr2_US_hap_B.Gain5;
-
-    /* Saturate: '<Root>/Saturation' */
-    if (pr2_US_hap_B.Subtract1 > pr2_US_hap_P.Saturation_UpperSat) {
-      /* Saturate: '<Root>/Saturation' */
-      pr2_US_hap_B.Saturation = pr2_US_hap_P.Saturation_UpperSat;
-    } else if (pr2_US_hap_B.Subtract1 < pr2_US_hap_P.Saturation_LowerSat) {
-      /* Saturate: '<Root>/Saturation' */
-      pr2_US_hap_B.Saturation = pr2_US_hap_P.Saturation_LowerSat;
-    } else {
-      /* Saturate: '<Root>/Saturation' */
-      pr2_US_hap_B.Saturation = pr2_US_hap_B.Subtract1;
-    }
-
-    /* End of Saturate: '<Root>/Saturation' */
-
-    /* DataTypeConversion: '<S5>/Data Type Conversion' incorporates:
-     *  Gain: '<S5>/Gain1'
+    /* Derivative: '<S10>/Derivative2' incorporates:
+     *  Derivative: '<S14>/Derivative2'
      */
-    rtb_Gain1 = floor(255.0 / pr2_US_hap_P.Vlim * pr2_US_hap_B.Saturation);
-    if (rtIsNaN(rtb_Gain1) || rtIsInf(rtb_Gain1)) {
-      rtb_Gain1 = 0.0;
+    tmp_0 = pr2_US_hap_M->Timing.t[0];
+    if ((pr2_US_hap_DW.TimeStampA >= tmp_0) && (pr2_US_hap_DW.TimeStampB >=
+         tmp_0)) {
+      pr2_US_hap_B.Gain1_m = 0.0;
     } else {
-      rtb_Gain1 = fmod(rtb_Gain1, 256.0);
+      pr2_US_hap_B.Gain1_m = pr2_US_hap_DW.TimeStampA;
+      lastU = &pr2_US_hap_DW.LastUAtTimeA;
+      if (pr2_US_hap_DW.TimeStampA < pr2_US_hap_DW.TimeStampB) {
+        if (pr2_US_hap_DW.TimeStampB < tmp_0) {
+          pr2_US_hap_B.Gain1_m = pr2_US_hap_DW.TimeStampB;
+          lastU = &pr2_US_hap_DW.LastUAtTimeB;
+        }
+      } else if (pr2_US_hap_DW.TimeStampA >= tmp_0) {
+        pr2_US_hap_B.Gain1_m = pr2_US_hap_DW.TimeStampB;
+        lastU = &pr2_US_hap_DW.LastUAtTimeB;
+      }
+
+      pr2_US_hap_B.Gain1_m = (pr2_US_hap_B.Gain3 - *lastU) / (tmp_0 -
+        pr2_US_hap_B.Gain1_m);
     }
 
-    /* DataTypeConversion: '<S5>/Data Type Conversion' */
-    pr2_US_hap_B.DataTypeConversion_e = (uint8_T)(rtb_Gain1 < 0.0 ? (int16_T)
-      (uint8_T)-(int8_T)(uint8_T)-rtb_Gain1 : (int16_T)(uint8_T)rtb_Gain1);
+    /* End of Derivative: '<S10>/Derivative2' */
 
-    /* DataTypeConversion: '<S5>/Data Type Conversion1' */
-    pr2_US_hap_B.DataTypeConversion1_m = pr2_US_hap_B.DataTypeConversion_e;
+    /* Sum: '<S10>/Subtract2' */
+    pr2_US_hap_B.Subtract2 = (pr2_US_hap_B.Derivative2 + pr2_US_hap_B.Gain2_gz)
+      + pr2_US_hap_B.Gain1_m;
+
+    /* Saturate: '<S4>/Saturation2' */
+    if (pr2_US_hap_B.Subtract2 > pr2_US_hap_P.Saturation2_UpperSat) {
+      /* Saturate: '<S4>/Saturation2' */
+      pr2_US_hap_B.Saturation2 = pr2_US_hap_P.Saturation2_UpperSat;
+    } else if (pr2_US_hap_B.Subtract2 < pr2_US_hap_P.Saturation2_LowerSat) {
+      /* Saturate: '<S4>/Saturation2' */
+      pr2_US_hap_B.Saturation2 = pr2_US_hap_P.Saturation2_LowerSat;
+    } else {
+      /* Saturate: '<S4>/Saturation2' */
+      pr2_US_hap_B.Saturation2 = pr2_US_hap_B.Subtract2;
+    }
+
+    /* End of Saturate: '<S4>/Saturation2' */
+
+    /* DataTypeConversion: '<S9>/Data Type Conversion' incorporates:
+     *  Gain: '<S9>/Gain1'
+     */
+    pr2_US_hap_B.Derivative2 = floor(255.0 / pr2_US_hap_P.Vlim *
+      pr2_US_hap_B.Saturation2);
+    if (rtIsNaN(pr2_US_hap_B.Derivative2) || rtIsInf(pr2_US_hap_B.Derivative2))
+    {
+      pr2_US_hap_B.Derivative2 = 0.0;
+    } else {
+      pr2_US_hap_B.Derivative2 = fmod(pr2_US_hap_B.Derivative2, 256.0);
+    }
+
+    /* DataTypeConversion: '<S9>/Data Type Conversion' */
+    pr2_US_hap_B.DataTypeConversion_h = (uint8_T)(pr2_US_hap_B.Derivative2 < 0.0
+      ? (int16_T)(uint8_T)-(int8_T)(uint8_T)-pr2_US_hap_B.Derivative2 : (int16_T)
+      (uint8_T)pr2_US_hap_B.Derivative2);
+
+    /* DataTypeConversion: '<S9>/Data Type Conversion1' */
+    pr2_US_hap_B.DataTypeConversion1 = pr2_US_hap_B.DataTypeConversion_h;
     if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
-      /* SignalConversion generated from: '<Root>/Mux1' */
+      /* SignalConversion generated from: '<S4>/Mux1' */
       pr2_US_hap_B.TmpSignalConversionAtTAQSigLogg[0] = 0.0;
       pr2_US_hap_B.TmpSignalConversionAtTAQSigLogg[1] =
-        pr2_US_hap_B.DataTypeConversion1_m;
+        pr2_US_hap_B.DataTypeConversion1;
+
+      /* DiscreteTransferFcn: '<S12>/Discrete Transfer Fcn' */
+      pr2_US_hap_B.DiscreteTransferFcn_c = tmp_4;
+
+      /* DiscreteTransferFcn: '<S12>/Discrete Transfer Fcn' */
+      tmp_1 = (uint32_T)pr2_US_hap_P.num_Gd[1L];
+      tmp_2 = (uint32_T)pr2_US_hap_DW.DiscreteTransferFcn_states_m;
+      sMultiWordMul(&tmp_1, 1, &tmp_2, 1,
+                    &pr2_US_hap_B.DiscreteTransferFcn_c.chunks[0U], 2);
+
+      /* Sum: '<S5>/Add1' incorporates:
+       *  DiscreteTransferFcn: '<S12>/Discrete Transfer Fcn'
+       */
+      rtb_Add1_m = pr2_US_hap_B.rout2 - sMultiWord2Double
+        (&pr2_US_hap_B.DiscreteTransferFcn_c.chunks[0U], 2, 0) *
+        1.1641532182693481E-10;
+
+      /* Gain: '<S14>/Gain2' */
+      pr2_US_hap_B.Gain2_f = pr2_US_hap_P.KP * rtb_Add1_m;
+
+      /* Gain: '<S14>/Gain3' */
+      pr2_US_hap_B.Gain3_k = pr2_US_hap_P.KD * rtb_Add1_m;
     }
 
-    /* MATLABSystem: '<S5>/PWM' */
-    pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
-    MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE, (real_T)
-                        pr2_US_hap_B.DataTypeConversion_e);
+    /* Derivative: '<S14>/Derivative2' */
+    if ((pr2_US_hap_DW.TimeStampA_g >= tmp_0) && (pr2_US_hap_DW.TimeStampB_c >=
+         tmp_0)) {
+      pr2_US_hap_B.Derivative2 = 0.0;
+    } else {
+      pr2_US_hap_B.Gain1_m = pr2_US_hap_DW.TimeStampA_g;
+      lastU = &pr2_US_hap_DW.LastUAtTimeA_p;
+      if (pr2_US_hap_DW.TimeStampA_g < pr2_US_hap_DW.TimeStampB_c) {
+        if (pr2_US_hap_DW.TimeStampB_c < tmp_0) {
+          pr2_US_hap_B.Gain1_m = pr2_US_hap_DW.TimeStampB_c;
+          lastU = &pr2_US_hap_DW.LastUAtTimeB_n;
+        }
+      } else if (pr2_US_hap_DW.TimeStampA_g >= tmp_0) {
+        pr2_US_hap_B.Gain1_m = pr2_US_hap_DW.TimeStampB_c;
+        lastU = &pr2_US_hap_DW.LastUAtTimeB_n;
+      }
+
+      pr2_US_hap_B.Derivative2 = (pr2_US_hap_B.Gain3_k - *lastU) / (tmp_0 -
+        pr2_US_hap_B.Gain1_m);
+    }
+
+    /* Sum: '<S14>/Subtract2' incorporates:
+     *  Integrator: '<S14>/Integrator2'
+     */
+    pr2_US_hap_B.Subtract2_p = (pr2_US_hap_X.Integrator2_CSTATE_f +
+      pr2_US_hap_B.Gain2_f) + pr2_US_hap_B.Derivative2;
+
+    /* Saturate: '<S5>/Saturation2' */
+    if (pr2_US_hap_B.Subtract2_p > pr2_US_hap_P.Saturation2_UpperSat_d) {
+      /* Saturate: '<S5>/Saturation2' */
+      pr2_US_hap_B.Saturation2_j = pr2_US_hap_P.Saturation2_UpperSat_d;
+    } else if (pr2_US_hap_B.Subtract2_p < pr2_US_hap_P.Saturation2_LowerSat_i) {
+      /* Saturate: '<S5>/Saturation2' */
+      pr2_US_hap_B.Saturation2_j = pr2_US_hap_P.Saturation2_LowerSat_i;
+    } else {
+      /* Saturate: '<S5>/Saturation2' */
+      pr2_US_hap_B.Saturation2_j = pr2_US_hap_B.Subtract2_p;
+    }
+
+    /* End of Saturate: '<S5>/Saturation2' */
+
+    /* DataTypeConversion: '<S13>/Data Type Conversion' incorporates:
+     *  Gain: '<S13>/Gain1'
+     */
+    tmp_0 = floor(255.0 / pr2_US_hap_P.Vlim * pr2_US_hap_B.Saturation2_j);
+    if (rtIsNaN(tmp_0) || rtIsInf(tmp_0)) {
+      tmp_0 = 0.0;
+    } else {
+      tmp_0 = fmod(tmp_0, 256.0);
+    }
+
+    /* DataTypeConversion: '<S13>/Data Type Conversion' */
+    pr2_US_hap_B.DataTypeConversion_g = (uint8_T)(tmp_0 < 0.0 ? (int16_T)
+      (uint8_T)-(int8_T)(uint8_T)-tmp_0 : (int16_T)(uint8_T)tmp_0);
+
+    /* DataTypeConversion: '<S13>/Data Type Conversion1' */
+    pr2_US_hap_B.DataTypeConversion1_e = pr2_US_hap_B.DataTypeConversion_g;
     if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
-      /* Gain: '<S6>/Gain4' */
-      pr2_US_hap_B.Gain4 = pr2_US_hap_P.KI * rtb_Add1;
+      /* SignalConversion generated from: '<S5>/Mux1' */
+      pr2_US_hap_B.TmpSignalConversionAtTAQSigLo_e[0] = 0.0;
+      pr2_US_hap_B.TmpSignalConversionAtTAQSigLo_e[1] =
+        pr2_US_hap_B.DataTypeConversion1_e;
+    }
 
-      /* DataTypeConversion: '<Root>/Data Type Conversion' */
-      pr2_US_hap_B.DataTypeConversion_n = pr2_US_hap_B.rout2;
+    /* MATLABSystem: '<S13>/PWM' */
+    pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(3UL);
+    MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE, (real_T)
+                        pr2_US_hap_B.DataTypeConversion_g);
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
+      /* Gain: '<S14>/Gain1' */
+      pr2_US_hap_B.Gain1_g = pr2_US_hap_P.KI * rtb_Add1_m;
+    }
 
-      /* Outport: '<Root>/Out1' */
-      pr2_US_hap_Y.Out1 = pr2_US_hap_B.buzzer;
+    /* MATLABSystem: '<S9>/PWM' */
+    pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
+    MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE, (real_T)
+                        pr2_US_hap_B.DataTypeConversion_h);
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
+      /* Gain: '<S10>/Gain1' */
+      pr2_US_hap_B.Gain1_p = pr2_US_hap_P.KI * rtb_Add1;
 
-      /* RateTransition generated from: '<Root>/Display3' */
-      switch (pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b) {
-       case 0:
-        pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu = 1;
-        break;
+      /* Outport: '<Root>/buzzer' */
+      pr2_US_hap_Y.buzzer = pr2_US_hap_B.buzzer;
+    }
 
-       case 1:
-        pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu = 0;
-        break;
+    /* MATLABSystem: '<S3>/PWM' */
+    pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(9UL);
 
-       default:
-        pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu =
-          pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_last_bu;
-        break;
-      }
+    /* Start for MATLABSystem: '<S3>/PWM' */
+    if (pr2_US_hap_B.DataTypeConversion <= 255.0) {
+      rtb_Add1 = pr2_US_hap_B.DataTypeConversion;
+    } else {
+      rtb_Add1 = 255.0;
+    }
 
-      if (pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu != 0) {
-        /* RateTransition generated from: '<Root>/Display3' */
-        pr2_US_hap_B.TmpRTBAtDisplay3Inport1 =
-          pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_Buffer1;
-      } else {
-        /* RateTransition generated from: '<Root>/Display3' */
-        pr2_US_hap_B.TmpRTBAtDisplay3Inport1 =
-          pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_Buffer0;
-      }
+    if (!(rtb_Add1 >= 0.0)) {
+      rtb_Add1 = 0.0;
+    }
 
-      pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu = -1;
+    /* MATLABSystem: '<S3>/PWM' */
+    MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE, rtb_Add1);
 
-      /* End of RateTransition generated from: '<Root>/Display3' */
+    /* MATLABSystem: '<S3>/PWM1' */
+    pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(10UL);
 
+    /* Start for MATLABSystem: '<S3>/PWM1' */
+    if (pr2_US_hap_B.DataTypeConversion <= 255.0) {
+      rtb_Add1 = pr2_US_hap_B.DataTypeConversion;
+    } else {
+      rtb_Add1 = 255.0;
+    }
+
+    if (!(rtb_Add1 >= 0.0)) {
+      rtb_Add1 = 0.0;
+    }
+
+    /* MATLABSystem: '<S3>/PWM1' */
+    MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE, rtb_Add1);
+
+    /* MATLABSystem: '<S3>/PWM2' */
+    pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(4UL);
+
+    /* Start for MATLABSystem: '<S3>/PWM2' */
+    if (pr2_US_hap_B.DataTypeConversion <= 255.0) {
+      rtb_Add1 = pr2_US_hap_B.DataTypeConversion;
+    } else {
+      rtb_Add1 = 255.0;
+    }
+
+    if (!(rtb_Add1 >= 0.0)) {
+      rtb_Add1 = 0.0;
+    }
+
+    /* MATLABSystem: '<S3>/PWM2' */
+    MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE, rtb_Add1);
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
       /* RateTransition generated from: '<Root>/Display2' */
       switch (pr2_US_hap_DW.TmpRTBAtDisplay2Inport1_write_b) {
        case 0:
@@ -1636,23 +1571,53 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
       pr2_US_hap_DW.TmpRTBAtDisplay2Inport1_read_bu = -1;
 
       /* End of RateTransition generated from: '<Root>/Display2' */
+
+      /* RateTransition generated from: '<S3>/Display' */
+      switch (pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu) {
+       case 0:
+        pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf = 1;
+        break;
+
+       case 1:
+        pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf = 0;
+        break;
+
+       default:
+        pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf =
+          pr2_US_hap_DW.TmpRTBAtDisplayInport1_last_buf;
+        break;
+      }
+
+      if (pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf != 0) {
+        /* RateTransition generated from: '<S3>/Display' */
+        pr2_US_hap_B.TmpRTBAtDisplayInport1 =
+          pr2_US_hap_DW.TmpRTBAtDisplayInport1_Buffer1;
+      } else {
+        /* RateTransition generated from: '<S3>/Display' */
+        pr2_US_hap_B.TmpRTBAtDisplayInport1 =
+          pr2_US_hap_DW.TmpRTBAtDisplayInport1_Buffer0;
+      }
+
+      pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf = -1;
+
+      /* End of RateTransition generated from: '<S3>/Display' */
     }
 
-    /* MATLABSystem: '<S4>/Encoder' */
-    if (pr2_US_hap_DW.obj.SampleTime != pr2_US_hap_P.Encoder_SampleTime) {
-      pr2_US_hap_DW.obj.SampleTime = pr2_US_hap_P.Encoder_SampleTime;
+    /* MATLABSystem: '<S8>/Encoder' */
+    if (pr2_US_hap_DW.obj_p.SampleTime != pr2_US_hap_P.Encoder_SampleTime) {
+      pr2_US_hap_DW.obj_p.SampleTime = pr2_US_hap_P.Encoder_SampleTime;
     }
 
-    if (pr2_US_hap_DW.obj.TunablePropsChanged) {
-      pr2_US_hap_DW.obj.TunablePropsChanged = false;
+    if (pr2_US_hap_DW.obj_p.TunablePropsChanged) {
+      pr2_US_hap_DW.obj_p.TunablePropsChanged = false;
     }
 
-    MW_EncoderRead(pr2_US_hap_DW.obj.Index, &tmp);
+    MW_EncoderRead(pr2_US_hap_DW.obj_p.Index, &tmp);
     if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
-      /* SampleTimeMath: '<S9>/TSamp' incorporates:
-       *  MATLABSystem: '<S4>/Encoder'
+      /* SampleTimeMath: '<S11>/TSamp' incorporates:
+       *  MATLABSystem: '<S8>/Encoder'
        *
-       * About '<S9>/TSamp':
+       * About '<S11>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -1662,11 +1627,12 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
        */
       rtb_TSamp = tmp;
 
-      /* Sum: '<S9>/Diff' incorporates:
-       *  SampleTimeMath: '<S9>/TSamp'
-       *  UnitDelay: '<S9>/UD'
+      /* Gain: '<S8>/Gain1' incorporates:
+       *  SampleTimeMath: '<S11>/TSamp'
+       *  Sum: '<S11>/Diff'
+       *  UnitDelay: '<S11>/UD'
        *
-       * About '<S9>/TSamp':
+       * About '<S11>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -1674,95 +1640,262 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
        *  to do work to handle the scaling of the output; this happens
        *  automatically.
        *
-       * Block description for '<S9>/Diff':
+       * Block description for '<S11>/Diff':
        *
        *  Add in CPU
        *
-       * Block description for '<S9>/UD':
+       * Block description for '<S11>/UD':
        *
        *  Store in Global RAM
        */
-      pr2_US_hap_B.Diff = rtb_TSamp - pr2_US_hap_DW.UD_DSTATE;
+      tmp_1 = (uint32_T)pr2_US_hap_P.encoder_scale;
+      tmp_2 = (uint32_T)(rtb_TSamp - pr2_US_hap_DW.UD_DSTATE);
+      sMultiWordMul(&tmp_1, 1, &tmp_2, 1, &pr2_US_hap_B.Gain1.chunks[0U], 2);
 
-      /* Gain: '<S4>/Gain2' incorporates:
-       *  Sum: '<S9>/Diff'
+      /* Gain: '<S8>/Gain2' incorporates:
+       *  Gain: '<S8>/Gain1'
+       */
+      sMultiWordMul(&pr2_US_hap_P.Gain2_Gain.chunks[0U], 2,
+                    &pr2_US_hap_B.Gain1.chunks[0U], 2,
+                    &pr2_US_hap_B.Gain2.chunks[0U], 4);
+
+      /* DataTypeConversion: '<S8>/Data Type Conversion1' incorporates:
+       *  Gain: '<S8>/Gain1'
+       */
+      tmp_3 = pr2_US_hap_B.Gain1;
+      sMultiWordMul(&pr2_US_hap_B.Gain1.chunks[0U], 2, &tmp_5.chunks[0U], 2,
+                    &pr2_US_hap_B.r2.chunks[0U], 4);
+      sMultiWordShr(&pr2_US_hap_B.r2.chunks[0U], 4, 31U,
+                    &pr2_US_hap_B.r1.chunks[0U], 4);
+
+      /* DataTypeConversion: '<S8>/Data Type Conversion1' */
+      pr2_US_hap_B.DataTypeConversion1_d = MultiWord2sLong
+        (&pr2_US_hap_B.r1.chunks[0U]);
+    }
+
+    /* MATLABSystem: '<S12>/Encoder' */
+    if (pr2_US_hap_DW.obj.SampleTime != pr2_US_hap_P.Encoder_SampleTime_e) {
+      pr2_US_hap_DW.obj.SampleTime = pr2_US_hap_P.Encoder_SampleTime_e;
+    }
+
+    if (pr2_US_hap_DW.obj.TunablePropsChanged) {
+      pr2_US_hap_DW.obj.TunablePropsChanged = false;
+    }
+
+    MW_EncoderRead(pr2_US_hap_DW.obj.Index, &tmp);
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
+      /* SampleTimeMath: '<S15>/TSamp' incorporates:
+       *  MATLABSystem: '<S12>/Encoder'
        *
-       * Block description for '<S9>/Diff':
+       * About '<S15>/TSamp':
+       *  y = u * K where K = 1 / ( w * Ts )
+       *  Multiplication by K = weightedTsampQuantized is being
+       *  done implicitly by changing the scaling of the input signal.
+       *  No work needs to be done here.  Downstream blocks may need
+       *  to do work to handle the scaling of the output; this happens
+       *  automatically.
+       */
+      rtb_TSamp_f = tmp;
+
+      /* Gain: '<S12>/Gain1' incorporates:
+       *  SampleTimeMath: '<S15>/TSamp'
+       *  Sum: '<S15>/Diff'
+       *  UnitDelay: '<S15>/UD'
+       *
+       * About '<S15>/TSamp':
+       *  y = u * K where K = 1 / ( w * Ts )
+       *  Multiplication by K = weightedTsampQuantized is being
+       *  done implicitly by changing the scaling of the input signal.
+       *  No work needs to be done here.  Downstream blocks may need
+       *  to do work to handle the scaling of the output; this happens
+       *  automatically.
+       *
+       * Block description for '<S15>/Diff':
        *
        *  Add in CPU
+       *
+       * Block description for '<S15>/UD':
+       *
+       *  Store in Global RAM
        */
-      tmp_0 = (uint32_T)pr2_US_hap_P.Gain2_Gain;
-      tmp_1 = (uint32_T)pr2_US_hap_B.Diff;
-      sMultiWordMul(&tmp_0, 1, &tmp_1, 1, &pr2_US_hap_B.Gain2.chunks[0U], 2);
+      tmp_1 = (uint32_T)pr2_US_hap_P.encoder_scale;
+      tmp_2 = (uint32_T)(rtb_TSamp_f - pr2_US_hap_DW.UD_DSTATE_m);
+      sMultiWordMul(&tmp_1, 1, &tmp_2, 1, &tmp_3.chunks[0U], 2);
 
-      /* DataTypeConversion: '<S4>/Data Type Conversion1' incorporates:
-       *  Sum: '<S9>/Diff'
-       *
-       * Block description for '<S9>/Diff':
-       *
-       *  Add in CPU
+      /* Gain: '<S12>/Gain1' incorporates:
+       *  Gain: '<S8>/Gain2'
        */
-      pr2_US_hap_B.DataTypeConversion1_c = pr2_US_hap_B.Diff * 100L;
+      pr2_US_hap_B.Gain1_a = tmp_3;
+
+      /* Gain: '<S12>/Gain2' incorporates:
+       *  Gain: '<S12>/Gain1'
+       */
+      sMultiWordMul(&pr2_US_hap_P.Gain2_Gain_d.chunks[0U], 2,
+                    &pr2_US_hap_B.Gain1_a.chunks[0U], 2,
+                    &pr2_US_hap_B.r2.chunks[0U], 4);
+
+      /* Gain: '<S12>/Gain2' incorporates:
+       *  DataTypeConversion: '<S8>/Data Type Conversion1'
+       */
+      pr2_US_hap_B.Gain2_g = pr2_US_hap_B.r2;
+
+      /* DataTypeConversion: '<S12>/Data Type Conversion1' incorporates:
+       *  Gain: '<S12>/Gain1'
+       */
+      sMultiWordMul(&pr2_US_hap_B.Gain1_a.chunks[0U], 2, &tmp_5.chunks[0U], 2,
+                    &pr2_US_hap_B.r4.chunks[0U], 4);
+      sMultiWordShr(&pr2_US_hap_B.r4.chunks[0U], 4, 31U,
+                    &pr2_US_hap_B.r3.chunks[0U], 4);
+
+      /* DataTypeConversion: '<S12>/Data Type Conversion1' */
+      pr2_US_hap_B.DataTypeConversion1_a = MultiWord2sLong
+        (&pr2_US_hap_B.r3.chunks[0U]);
+
+      /* Constant: '<Root>/Constant' */
+      pr2_US_hap_B.Constant = pr2_US_hap_P.l;
     }
   }
 
   if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
     int64m_T denAccum;
     int64m_T denAccum_0;
-    int64m_T tmp;
-    int64m_T tmp_0;
-    int64m_T tmp_4;
-    int96m_T tmp_3;
-    uint32_T tmp_1;
-    uint32_T tmp_2;
-    static const int64m_T tmp_5 = { { MAX_uint32_T, 2147483647UL }/* chunks */
+    int64m_T tmp_1;
+    int64m_T tmp_2;
+    int64m_T tmp_3;
+    real_T *lastU;
+    uint32_T tmp;
+    uint32_T tmp_0;
+    static const int64m_T tmp_4 = { { MAX_uint32_T, 2147483647UL }/* chunks */
     };
 
-    static const int64m_T tmp_6 = { { 0UL, 0UL }/* chunks */
+    static const int64m_T tmp_5 = { { 0UL, 0UL }/* chunks */
     };
 
-    static const int64m_T tmp_7 = { { 0UL, 2147483648UL }/* chunks */
+    static const int64m_T tmp_6 = { { 0UL, 2147483648UL }/* chunks */
     };
 
     if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
-      /* Update for DiscreteTransferFcn: '<S4>/Discrete Transfer Fcn' */
-      sLong2MultiWord(pr2_US_hap_B.DataTypeConversion1_c, &tmp_0.chunks[0U], 2);
-      sMultiWordShl(&tmp_0.chunks[0U], 2, 30U, &denAccum.chunks[0U], 2);
-      tmp_1 = (uint32_T)pr2_US_hap_P.den_Gd[1L];
-      tmp_2 = (uint32_T)pr2_US_hap_DW.DiscreteTransferFcn_states;
-      sMultiWordMul(&tmp_1, 1, &tmp_2, 1, &tmp_0.chunks[0U], 2);
-      MultiWordSub(&denAccum.chunks[0U], &tmp_0.chunks[0U], &denAccum_0.chunks
-                   [0U], 2);
+      /* Update for DiscreteTransferFcn: '<S8>/Discrete Transfer Fcn' */
+      sLong2MultiWord(pr2_US_hap_B.DataTypeConversion1_d,
+                      &pr2_US_hap_B.r12.chunks[0U], 2);
+      sMultiWordShl(&pr2_US_hap_B.r12.chunks[0U], 2, 30U,
+                    &pr2_US_hap_B.denAccum.chunks[0U], 2);
+      tmp = (uint32_T)pr2_US_hap_P.den_Gd[1L];
+      tmp_0 = (uint32_T)pr2_US_hap_DW.DiscreteTransferFcn_states;
+      sMultiWordMul(&tmp, 1, &tmp_0, 1, &pr2_US_hap_B.r12.chunks[0U], 2);
+      MultiWordSub(&pr2_US_hap_B.denAccum.chunks[0U], &pr2_US_hap_B.r12.chunks
+                   [0U], &denAccum.chunks[0U], 2);
+      pr2_US_hap_B.denAccum = denAccum;
       if (pr2_US_hap_P.den_Gd[0] == 0L) {
-        if (sMultiWordGe(&denAccum_0.chunks[0U], &tmp_6.chunks[0U], 2)) {
-          tmp = tmp_5;
+        if (sMultiWordGe(&pr2_US_hap_B.denAccum.chunks[0U], &tmp_5.chunks[0U], 2))
+        {
+          pr2_US_hap_B.r11 = tmp_4;
         } else {
-          tmp = tmp_7;
+          pr2_US_hap_B.r11 = tmp_6;
         }
       } else {
-        sMultiWord2MultiWord(&denAccum_0.chunks[0U], 2, &pr2_US_hap_B.r2.chunks
-                             [0U], 3);
-        sMultiWordShl(&pr2_US_hap_B.r2.chunks[0U], 3, 30U,
-                      &pr2_US_hap_B.r1.chunks[0U], 3);
-        sLong2MultiWord(pr2_US_hap_P.den_Gd[0], &pr2_US_hap_B.r2.chunks[0U], 3);
-        sMultiWordDivFloor(&pr2_US_hap_B.r1.chunks[0U], 3,
-                           &pr2_US_hap_B.r2.chunks[0U], 3,
+        sMultiWord2MultiWord(&pr2_US_hap_B.denAccum.chunks[0U], 2,
+                             &pr2_US_hap_B.r6.chunks[0U], 3);
+        sMultiWordShl(&pr2_US_hap_B.r6.chunks[0U], 3, 30U,
+                      &pr2_US_hap_B.r5.chunks[0U], 3);
+        sLong2MultiWord(pr2_US_hap_P.den_Gd[0], &pr2_US_hap_B.r6.chunks[0U], 3);
+        sMultiWordDivFloor(&pr2_US_hap_B.r5.chunks[0U], 3,
+                           &pr2_US_hap_B.r6.chunks[0U], 3,
                            &pr2_US_hap_B.r.chunks[0U], 4,
-                           &pr2_US_hap_B.r3.chunks[0U], 3,
-                           &pr2_US_hap_B.r4.chunks[0U], 3, &tmp_3.chunks[0U], 3);
-        sMultiWord2MultiWord(&pr2_US_hap_B.r.chunks[0U], 4, &tmp.chunks[0U], 2);
+                           &pr2_US_hap_B.r7.chunks[0U], 3,
+                           &pr2_US_hap_B.r8.chunks[0U], 3,
+                           &pr2_US_hap_B.r9.chunks[0U], 3);
+        sMultiWord2MultiWord(&pr2_US_hap_B.r.chunks[0U], 4,
+                             &pr2_US_hap_B.r11.chunks[0U], 2);
       }
 
-      sMultiWordShr(&tmp.chunks[0U], 2, 30U, &tmp_4.chunks[0U], 2);
-      pr2_US_hap_DW.DiscreteTransferFcn_states = MultiWord2sLong(&tmp_4.chunks
+      sMultiWordShr(&pr2_US_hap_B.r11.chunks[0U], 2, 30U, &tmp_1.chunks[0U], 2);
+      pr2_US_hap_DW.DiscreteTransferFcn_states = MultiWord2sLong(&tmp_1.chunks
         [0U]);
 
-      /* End of Update for DiscreteTransferFcn: '<S4>/Discrete Transfer Fcn' */
+      /* End of Update for DiscreteTransferFcn: '<S8>/Discrete Transfer Fcn' */
+    }
 
-      /* Update for UnitDelay: '<S9>/UD' incorporates:
-       *  SampleTimeMath: '<S9>/TSamp'
+    /* Update for Derivative: '<S10>/Derivative2' */
+    if (pr2_US_hap_DW.TimeStampA == (rtInf)) {
+      pr2_US_hap_DW.TimeStampA = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeA;
+    } else if (pr2_US_hap_DW.TimeStampB == (rtInf)) {
+      pr2_US_hap_DW.TimeStampB = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeB;
+    } else if (pr2_US_hap_DW.TimeStampA < pr2_US_hap_DW.TimeStampB) {
+      pr2_US_hap_DW.TimeStampA = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeA;
+    } else {
+      pr2_US_hap_DW.TimeStampB = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeB;
+    }
+
+    *lastU = pr2_US_hap_B.Gain3;
+
+    /* End of Update for Derivative: '<S10>/Derivative2' */
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
+      /* Update for DiscreteTransferFcn: '<S12>/Discrete Transfer Fcn' */
+      sLong2MultiWord(pr2_US_hap_B.DataTypeConversion1_a, &tmp_2.chunks[0U], 2);
+      sMultiWordShl(&tmp_2.chunks[0U], 2, 30U, &pr2_US_hap_B.denAccum.chunks[0U],
+                    2);
+      tmp = (uint32_T)pr2_US_hap_P.den_Gd[1L];
+      tmp_0 = (uint32_T)pr2_US_hap_DW.DiscreteTransferFcn_states_m;
+      sMultiWordMul(&tmp, 1, &tmp_0, 1, &tmp_2.chunks[0U], 2);
+      MultiWordSub(&pr2_US_hap_B.denAccum.chunks[0U], &tmp_2.chunks[0U],
+                   &denAccum_0.chunks[0U], 2);
+      if (pr2_US_hap_P.den_Gd[0] == 0L) {
+        if (sMultiWordGe(&denAccum_0.chunks[0U], &tmp_5.chunks[0U], 2)) {
+          pr2_US_hap_B.r10 = tmp_4;
+        } else {
+          pr2_US_hap_B.r10 = tmp_6;
+        }
+      } else {
+        sMultiWord2MultiWord(&denAccum_0.chunks[0U], 2, &pr2_US_hap_B.r6.chunks
+                             [0U], 3);
+        sMultiWordShl(&pr2_US_hap_B.r6.chunks[0U], 3, 30U,
+                      &pr2_US_hap_B.r5.chunks[0U], 3);
+        sLong2MultiWord(pr2_US_hap_P.den_Gd[0], &pr2_US_hap_B.r6.chunks[0U], 3);
+        sMultiWordDivFloor(&pr2_US_hap_B.r5.chunks[0U], 3,
+                           &pr2_US_hap_B.r6.chunks[0U], 3,
+                           &pr2_US_hap_B.r.chunks[0U], 4,
+                           &pr2_US_hap_B.r7.chunks[0U], 3,
+                           &pr2_US_hap_B.r8.chunks[0U], 3,
+                           &pr2_US_hap_B.r9.chunks[0U], 3);
+        sMultiWord2MultiWord(&pr2_US_hap_B.r.chunks[0U], 4,
+                             &pr2_US_hap_B.r10.chunks[0U], 2);
+      }
+
+      sMultiWordShr(&pr2_US_hap_B.r10.chunks[0U], 2, 30U, &tmp_3.chunks[0U], 2);
+      pr2_US_hap_DW.DiscreteTransferFcn_states_m = MultiWord2sLong
+        (&tmp_3.chunks[0U]);
+
+      /* End of Update for DiscreteTransferFcn: '<S12>/Discrete Transfer Fcn' */
+    }
+
+    /* Update for Derivative: '<S14>/Derivative2' */
+    if (pr2_US_hap_DW.TimeStampA_g == (rtInf)) {
+      pr2_US_hap_DW.TimeStampA_g = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeA_p;
+    } else if (pr2_US_hap_DW.TimeStampB_c == (rtInf)) {
+      pr2_US_hap_DW.TimeStampB_c = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeB_n;
+    } else if (pr2_US_hap_DW.TimeStampA_g < pr2_US_hap_DW.TimeStampB_c) {
+      pr2_US_hap_DW.TimeStampA_g = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeA_p;
+    } else {
+      pr2_US_hap_DW.TimeStampB_c = pr2_US_hap_M->Timing.t[0];
+      lastU = &pr2_US_hap_DW.LastUAtTimeB_n;
+    }
+
+    *lastU = pr2_US_hap_B.Gain3_k;
+
+    /* End of Update for Derivative: '<S14>/Derivative2' */
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
+      /* Update for UnitDelay: '<S11>/UD' incorporates:
+       *  SampleTimeMath: '<S11>/TSamp'
        *
-       * About '<S9>/TSamp':
+       * About '<S11>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -1770,22 +1903,53 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
        *  to do work to handle the scaling of the output; this happens
        *  automatically.
        *
-       * Block description for '<S9>/UD':
+       * Block description for '<S11>/UD':
        *
        *  Store in Global RAM
        */
       pr2_US_hap_DW.UD_DSTATE = rtb_TSamp;
+
+      /* Update for UnitDelay: '<S15>/UD' incorporates:
+       *  SampleTimeMath: '<S15>/TSamp'
+       *
+       * About '<S15>/TSamp':
+       *  y = u * K where K = 1 / ( w * Ts )
+       *  Multiplication by K = weightedTsampQuantized is being
+       *  done implicitly by changing the scaling of the input signal.
+       *  No work needs to be done here.  Downstream blocks may need
+       *  to do work to handle the scaling of the output; this happens
+       *  automatically.
+       *
+       * Block description for '<S15>/UD':
+       *
+       *  Store in Global RAM
+       */
+      pr2_US_hap_DW.UD_DSTATE_m = rtb_TSamp_f;
     }
 
-    {
-      extmodeErrorCode_T returnCode = EXTMODE_SUCCESS;
-      extmodeSimulationTime_T currentSimTime = (extmodeSimulationTime_T)
+    {                                  /* Sample time: [0.0s, 0.0s] */
+      extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
+      extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T)
         ((pr2_US_hap_M->Timing.clockTick0 * 1) + 0)
         ;
 
       /* Trigger External Mode event */
-      returnCode = extmodeEvent(1,currentSimTime);
-      if (returnCode != EXTMODE_SUCCESS) {
+      errorCode = extmodeEvent(0,currentTime);
+      if (errorCode != EXTMODE_SUCCESS) {
+        /* Code to handle External Mode event errors
+           may be added here */
+      }
+    }
+
+    if (rtmIsMajorTimeStep(pr2_US_hap_M)) {/* Sample time: [0.01s, 0.0s] */
+      extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
+      extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T)
+        ((pr2_US_hap_M->Timing.clockTick1 * 1) + 0)
+        ;
+
+      /* Trigger External Mode event */
+      errorCode = extmodeEvent(1,currentTime);
+      if (errorCode != EXTMODE_SUCCESS) {
         /* Code to handle External Mode event errors
            may be added here */
       }
@@ -1795,7 +1959,7 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
   if (rtmIsMajorTimeStep(pr2_US_hap_M)) {
     rt_ertODEUpdateContinuousStates(&pr2_US_hap_M->solverInfo);
 
-    /* Update absolute time */
+    /* Update absolute time for base rate */
     /* The "clockTick0" counts the number of times the code of this task has
      * been executed. The absolute time is the multiplication of "clockTick0"
      * and "Timing.stepSize0". Size of "clockTick0" ensures timer will not
@@ -1803,54 +1967,37 @@ void pr2_US_hap_step0(void)            /* Sample time: [0.0s, 0.0s] */
      */
     ++pr2_US_hap_M->Timing.clockTick0;
     pr2_US_hap_M->Timing.t[0] = rtsiGetSolverStopTime(&pr2_US_hap_M->solverInfo);
-    switch (pr2_US_hap_M->Timing.rtmDbBufReadBuf3) {
+
+    {
+      /* Update absolute timer for sample time: [0.01s, 0.0s] */
+      /* The "clockTick1" counts the number of times the code of this task has
+       * been executed. The resolution of this integer timer is 0.01, which is the step size
+       * of the task. Size of "clockTick1" ensures timer will not overflow during the
+       * application lifespan selected.
+       */
+      pr2_US_hap_M->Timing.clockTick1++;
+    }
+
+    switch (pr2_US_hap_M->Timing.rtmDbBufReadBuf2) {
      case 0:
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf3 = 1;
+      pr2_US_hap_M->Timing.rtmDbBufWriteBuf2 = 1;
       break;
 
      case 1:
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf3 = 0;
+      pr2_US_hap_M->Timing.rtmDbBufWriteBuf2 = 0;
       break;
 
      default:
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf3 =
-        !pr2_US_hap_M->Timing.rtmDbBufLastBufWr3;
+      pr2_US_hap_M->Timing.rtmDbBufWriteBuf2 =
+        !pr2_US_hap_M->Timing.rtmDbBufLastBufWr2;
       break;
     }
 
-    pr2_US_hap_M->Timing.rtmDbBufClockTick3
-      [pr2_US_hap_M->Timing.rtmDbBufWriteBuf3] = pr2_US_hap_M->Timing.clockTick0;
-    pr2_US_hap_M->Timing.rtmDbBufLastBufWr3 =
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf3;
-    pr2_US_hap_M->Timing.rtmDbBufWriteBuf3 = 0xFF;
-    switch (pr2_US_hap_M->Timing.rtmDbBufReadBuf4) {
-     case 0:
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf4 = 1;
-      break;
-
-     case 1:
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf4 = 0;
-      break;
-
-     default:
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf4 =
-        !pr2_US_hap_M->Timing.rtmDbBufLastBufWr4;
-      break;
-    }
-
-    pr2_US_hap_M->Timing.rtmDbBufClockTick4
-      [pr2_US_hap_M->Timing.rtmDbBufWriteBuf4] = pr2_US_hap_M->Timing.clockTick0;
-    pr2_US_hap_M->Timing.rtmDbBufLastBufWr4 =
-      pr2_US_hap_M->Timing.rtmDbBufWriteBuf4;
-    pr2_US_hap_M->Timing.rtmDbBufWriteBuf4 = 0xFF;
-
-    /* Update absolute time */
-    /* The "clockTick1" counts the number of times the code of this task has
-     * been executed. The resolution of this integer timer is 0.01, which is the step size
-     * of the task. Size of "clockTick1" ensures timer will not overflow during the
-     * application lifespan selected.
-     */
-    pr2_US_hap_M->Timing.clockTick1++;
+    pr2_US_hap_M->Timing.rtmDbBufClockTick2
+      [pr2_US_hap_M->Timing.rtmDbBufWriteBuf2] = pr2_US_hap_M->Timing.clockTick0;
+    pr2_US_hap_M->Timing.rtmDbBufLastBufWr2 =
+      pr2_US_hap_M->Timing.rtmDbBufWriteBuf2;
+    pr2_US_hap_M->Timing.rtmDbBufWriteBuf2 = 0xFF;
   }                                    /* end MajorTimeStep */
 }
 
@@ -1860,58 +2007,11 @@ void pr2_US_hap_derivatives(void)
   XDot_pr2_US_hap_T *_rtXdot;
   _rtXdot = ((XDot_pr2_US_hap_T *) pr2_US_hap_M->derivs);
 
-  /* Derivatives for Integrator: '<S6>/Integrator1' */
-  _rtXdot->Integrator1_CSTATE = pr2_US_hap_B.Gain4;
-}
+  /* Derivatives for Integrator: '<S10>/Integrator2' */
+  _rtXdot->Integrator2_CSTATE = pr2_US_hap_B.Gain1_p;
 
-/* Model step function for TID2 */
-void pr2_US_hap_step2(void)            /* Sample time: [0.1s, 0.0s] */
-{
-  uint32_T duration;
-
-  /* MATLABSystem: '<Root>/우측 초음파' */
-  if (pr2_US_hap_DW.obj_hy.TunablePropsChanged) {
-    pr2_US_hap_DW.obj_hy.TunablePropsChanged = false;
-  }
-
-  MW_UltrasonicRead(&duration, 1, 52, 53, 10);
-
-  /* End of MATLABSystem: '<Root>/우측 초음파' */
-
-  /* MATLABSystem: '<Root>/전방 초음파' */
-  if (pr2_US_hap_DW.obj_p.TunablePropsChanged) {
-    pr2_US_hap_DW.obj_p.TunablePropsChanged = false;
-  }
-
-  MW_UltrasonicRead(&duration, 1, 46, 47, 10);
-
-  /* End of MATLABSystem: '<Root>/전방 초음파' */
-
-  /* MATLABSystem: '<Root>/좌측 초음파' */
-  if (pr2_US_hap_DW.obj_h.TunablePropsChanged) {
-    pr2_US_hap_DW.obj_h.TunablePropsChanged = false;
-  }
-
-  MW_UltrasonicRead(&duration, 1, 50, 51, 10);
-
-  /* End of MATLABSystem: '<Root>/좌측 초음파' */
-
-  /* MATLABSystem: '<Root>/후방 초음파' */
-  if (pr2_US_hap_DW.obj_g.TunablePropsChanged) {
-    pr2_US_hap_DW.obj_g.TunablePropsChanged = false;
-  }
-
-  MW_UltrasonicRead(&duration, 1, 48, 49, 10);
-
-  /* End of MATLABSystem: '<Root>/후방 초음파' */
-
-  /* Update absolute time */
-  /* The "clockTick2" counts the number of times the code of this task has
-   * been executed. The resolution of this integer timer is 0.1, which is the step size
-   * of the task. Size of "clockTick2" ensures timer will not overflow during the
-   * application lifespan selected.
-   */
-  pr2_US_hap_M->Timing.clockTick2++;
+  /* Derivatives for Integrator: '<S14>/Integrator2' */
+  _rtXdot->Integrator2_CSTATE_f = pr2_US_hap_B.Gain1_g;
 }
 
 /* Model initialize function */
@@ -1963,15 +2063,15 @@ void pr2_US_hap_initialize(void)
   pr2_US_hap_M->Timing.stepSize0 = 0.01;
 
   /* External mode info */
-  pr2_US_hap_M->Sizes.checksums[0] = (497492981U);
-  pr2_US_hap_M->Sizes.checksums[1] = (3219502741U);
-  pr2_US_hap_M->Sizes.checksums[2] = (1648610609U);
-  pr2_US_hap_M->Sizes.checksums[3] = (1256264990U);
+  pr2_US_hap_M->Sizes.checksums[0] = (3121233060U);
+  pr2_US_hap_M->Sizes.checksums[1] = (2460855214U);
+  pr2_US_hap_M->Sizes.checksums[2] = (1357738547U);
+  pr2_US_hap_M->Sizes.checksums[3] = (2397395330U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
     static RTWExtModeInfo rt_ExtModeInfo;
-    static const sysRanDType *systemRan[12];
+    static const sysRanDType *systemRan[13];
     pr2_US_hap_M->extModeInfo = (&rt_ExtModeInfo);
     rteiSetSubSystemActiveVectorAddresses(&rt_ExtModeInfo, systemRan);
     systemRan[0] = &rtAlwaysEnabled;
@@ -1986,39 +2086,28 @@ void pr2_US_hap_initialize(void)
     systemRan[9] = &rtAlwaysEnabled;
     systemRan[10] = &rtAlwaysEnabled;
     systemRan[11] = &rtAlwaysEnabled;
+    systemRan[12] = &rtAlwaysEnabled;
     rteiSetModelMappingInfoPtr(pr2_US_hap_M->extModeInfo,
       &pr2_US_hap_M->SpecialInfo.mappingInfo);
     rteiSetChecksumsPtr(pr2_US_hap_M->extModeInfo, pr2_US_hap_M->Sizes.checksums);
     rteiSetTPtr(pr2_US_hap_M->extModeInfo, rtmGetTPtr(pr2_US_hap_M));
   }
 
-  pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 0xFF;
-  pr2_US_hap_M->Timing.rtmDbBufWriteBuf3 = 0xFF;
-  pr2_US_hap_M->Timing.rtmDbBufLastBufWr3 = 0;
-  pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 0xFF;
-  pr2_US_hap_M->Timing.rtmDbBufWriteBuf4 = 0xFF;
-  pr2_US_hap_M->Timing.rtmDbBufLastBufWr4 = 0;
+  pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 0xFF;
+  pr2_US_hap_M->Timing.rtmDbBufWriteBuf2 = 0xFF;
+  pr2_US_hap_M->Timing.rtmDbBufLastBufWr2 = 0;
 
   /* Start for Constant: '<Root>/Constant3' */
-  pr2_US_hap_B.Constant3 = pr2_US_hap_P.Constant3_Value;
-
-  /* Start for Constant: '<Root>/Constant' */
-  pr2_US_hap_B.Constant = pr2_US_hap_P.Constant_Value_n;
+  pr2_US_hap_B.Constant3 = pr2_US_hap_P.f;
 
   /* Start for Constant: '<Root>/Constant1' */
-  pr2_US_hap_B.Constant1 = pr2_US_hap_P.Constant1_Value;
+  pr2_US_hap_B.Constant1 = pr2_US_hap_P.r;
 
   /* Start for Constant: '<Root>/Constant2' */
-  pr2_US_hap_B.Constant2 = pr2_US_hap_P.Constant2_Value;
+  pr2_US_hap_B.Constant2 = pr2_US_hap_P.b;
 
-  /* InitializeConditions for Integrator: '<S6>/Integrator1' */
-  pr2_US_hap_X.Integrator1_CSTATE = pr2_US_hap_P.Integrator1_IC;
-
-  /* InitializeConditions for RateTransition generated from: '<S3>/Chart1' */
-  pr2_US_hap_DW.TmpRTBAtChart1Inport1_Buffer0 =
-    pr2_US_hap_P.TmpRTBAtChart1Inport1_InitialCo;
-  pr2_US_hap_DW.TmpRTBAtChart1Inport1_write_buf = -1;
-  pr2_US_hap_DW.TmpRTBAtChart1Inport1_read_buf = -1;
+  /* InitializeConditions for Integrator: '<S10>/Integrator2' */
+  pr2_US_hap_X.Integrator2_CSTATE = pr2_US_hap_P.Integrator2_IC;
 
   /* InitializeConditions for RateTransition generated from: '<S3>/Chart' */
   pr2_US_hap_DW.TmpRTBAtChartInport1_Buffer0 =
@@ -2026,21 +2115,24 @@ void pr2_US_hap_initialize(void)
   pr2_US_hap_DW.TmpRTBAtChartInport1_write_buf = -1;
   pr2_US_hap_DW.TmpRTBAtChartInport1_read_buf = -1;
 
-  /* InitializeConditions for RateTransition generated from: '<S3>/Chart' */
-  pr2_US_hap_DW.TmpRTBAtChartInport2_Buffer0 =
-    pr2_US_hap_P.TmpRTBAtChartInport2_InitialCon;
-  pr2_US_hap_DW.TmpRTBAtChartInport2_write_buf = -1;
-  pr2_US_hap_DW.TmpRTBAtChartInport2_read_buf = -1;
-
-  /* InitializeConditions for DiscreteTransferFcn: '<S4>/Discrete Transfer Fcn' */
+  /* InitializeConditions for DiscreteTransferFcn: '<S8>/Discrete Transfer Fcn' */
   pr2_US_hap_DW.DiscreteTransferFcn_states =
     pr2_US_hap_P.DiscreteTransferFcn_InitialStat;
 
-  /* InitializeConditions for RateTransition generated from: '<Root>/Display3' */
-  pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_Buffer0 =
-    pr2_US_hap_P.TmpRTBAtDisplay3Inport1_Initial;
-  pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_write_b = -1;
-  pr2_US_hap_DW.TmpRTBAtDisplay3Inport1_read_bu = -1;
+  /* InitializeConditions for Derivative: '<S10>/Derivative2' */
+  pr2_US_hap_DW.TimeStampA = (rtInf);
+  pr2_US_hap_DW.TimeStampB = (rtInf);
+
+  /* InitializeConditions for Integrator: '<S14>/Integrator2' */
+  pr2_US_hap_X.Integrator2_CSTATE_f = pr2_US_hap_P.Integrator2_IC_f;
+
+  /* InitializeConditions for DiscreteTransferFcn: '<S12>/Discrete Transfer Fcn' */
+  pr2_US_hap_DW.DiscreteTransferFcn_states_m =
+    pr2_US_hap_P.DiscreteTransferFcn_InitialSt_i;
+
+  /* InitializeConditions for Derivative: '<S14>/Derivative2' */
+  pr2_US_hap_DW.TimeStampA_g = (rtInf);
+  pr2_US_hap_DW.TimeStampB_c = (rtInf);
 
   /* InitializeConditions for RateTransition generated from: '<Root>/Display2' */
   pr2_US_hap_DW.TmpRTBAtDisplay2Inport1_Buffer0 =
@@ -2048,13 +2140,27 @@ void pr2_US_hap_initialize(void)
   pr2_US_hap_DW.TmpRTBAtDisplay2Inport1_write_b = -1;
   pr2_US_hap_DW.TmpRTBAtDisplay2Inport1_read_bu = -1;
 
-  /* InitializeConditions for UnitDelay: '<S9>/UD'
+  /* InitializeConditions for RateTransition generated from: '<S3>/Display' */
+  pr2_US_hap_DW.TmpRTBAtDisplayInport1_Buffer0 =
+    pr2_US_hap_P.TmpRTBAtDisplayInport1_InitialC;
+  pr2_US_hap_DW.TmpRTBAtDisplayInport1_write_bu = -1;
+  pr2_US_hap_DW.TmpRTBAtDisplayInport1_read_buf = -1;
+
+  /* InitializeConditions for UnitDelay: '<S11>/UD'
    *
-   * Block description for '<S9>/UD':
+   * Block description for '<S11>/UD':
    *
    *  Store in Global RAM
    */
   pr2_US_hap_DW.UD_DSTATE = pr2_US_hap_P.DiscreteDerivative_ICPrevScaled;
+
+  /* InitializeConditions for UnitDelay: '<S15>/UD'
+   *
+   * Block description for '<S15>/UD':
+   *
+   *  Store in Global RAM
+   */
+  pr2_US_hap_DW.UD_DSTATE_m = pr2_US_hap_P.DiscreteDerivative_ICPrevScal_g;
 
   /* SystemInitialize for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW1)' incorporates:
    *  SubSystem: '<Root>/SW1 PUSH'
@@ -2064,24 +2170,24 @@ void pr2_US_hap_initialize(void)
 
   /* Asynchronous task (with no priority assigned)
    * reads absolute time */
-  switch (pr2_US_hap_M->Timing.rtmDbBufWriteBuf3) {
+  switch (pr2_US_hap_M->Timing.rtmDbBufWriteBuf2) {
    case 0:
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 1;
+    pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 1;
     break;
 
    case 1:
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 0;
+    pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 0;
     break;
 
    default:
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf3 =
-      pr2_US_hap_M->Timing.rtmDbBufLastBufWr3;
+    pr2_US_hap_M->Timing.rtmDbBufReadBuf2 =
+      pr2_US_hap_M->Timing.rtmDbBufLastBufWr2;
     break;
   }
 
-  pr2_US_hap_M->Timing.clockTick3 = pr2_US_hap_M->
-    Timing.rtmDbBufClockTick3[pr2_US_hap_M->Timing.rtmDbBufReadBuf3];
-  pr2_US_hap_M->Timing.rtmDbBufReadBuf3 = 0xFF;
+  pr2_US_hap_M->Timing.clockTick2 = pr2_US_hap_M->
+    Timing.rtmDbBufClockTick2[pr2_US_hap_M->Timing.rtmDbBufReadBuf2];
+  pr2_US_hap_M->Timing.rtmDbBufReadBuf2 = 0xFF;
 
   /* InitializeConditions for Delay: '<S1>/Delay' */
   pr2_US_hap_DW.Delay_DSTATE_a = pr2_US_hap_P.Delay_InitialCondition;
@@ -2095,92 +2201,70 @@ void pr2_US_hap_initialize(void)
   attachInterrupt(digitalPinToInterrupt(2), &MW_ISR_2, RISING);
 
   /* End of SystemInitialize for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW1)' */
-
-  /* SystemInitialize for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW2)' incorporates:
-   *  SubSystem: '<Root>/SW1 PUSH1'
-   */
-
-  /* System initialize for function-call system: '<Root>/SW1 PUSH1' */
-
-  /* Asynchronous task (with no priority assigned)
-   * reads absolute time */
-  switch (pr2_US_hap_M->Timing.rtmDbBufWriteBuf4) {
-   case 0:
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 1;
-    break;
-
-   case 1:
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 0;
-    break;
-
-   default:
-    pr2_US_hap_M->Timing.rtmDbBufReadBuf4 =
-      pr2_US_hap_M->Timing.rtmDbBufLastBufWr4;
-    break;
-  }
-
-  pr2_US_hap_M->Timing.clockTick4 = pr2_US_hap_M->
-    Timing.rtmDbBufClockTick4[pr2_US_hap_M->Timing.rtmDbBufReadBuf4];
-  pr2_US_hap_M->Timing.rtmDbBufReadBuf4 = 0xFF;
-
-  /* InitializeConditions for Delay: '<S2>/Delay' */
-  pr2_US_hap_DW.Delay_DSTATE = pr2_US_hap_P.Delay_InitialCondition_e;
-
-  /* SystemInitialize for Sum: '<S2>/Add' incorporates:
-   *  Outport: '<S2>/sw1'
-   */
-  pr2_US_hap_B.Add = pr2_US_hap_P.sw1_Y0_e;
-
-  /* Attach callback function */
-  attachInterrupt(digitalPinToInterrupt(3), &MW_ISR_3, RISING);
-
-  /* End of SystemInitialize for S-Function (arduinoextint_sfcn): '<Root>/External Interrupt(SW2)' */
+  pr2_US_hap_SW1PUSH1_Init();
 
   /* Start for MATLABSystem: '<Root>/가변저항' */
   pr2_US_hap_DW.obj_n.matlabCodegenIsDeleted = false;
   pr2_US_hap_DW.obj_n.SampleTime = pr2_US_hap_P._SampleTime;
   pr2_US_hap_DW.obj_n.isInitialized = 1L;
   pr2_US_hap_DW.obj_n.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-    MW_AnalogInSingle_Open(54UL);
+    MW_AnalogInSingle_Open(62UL);
   pr2_US_hap_DW.obj_n.isSetupComplete = true;
 
-  /* Start for MATLABSystem: '<S5>/PWM' */
-  pr2_US_hap_DW.obj_b.matlabCodegenIsDeleted = false;
-  pr2_US_hap_DW.obj_b.isInitialized = 1L;
-  pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL, 0.0, 0.0);
-  pr2_US_hap_DW.obj_b.isSetupComplete = true;
+  /* Start for MATLABSystem: '<S13>/PWM' */
+  pr2_US_hap_DW.obj_d.matlabCodegenIsDeleted = false;
+  pr2_US_hap_DW.obj_d.isInitialized = 1L;
+  pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(3UL, 0.0, 0.0);
+  pr2_US_hap_DW.obj_d.isSetupComplete = true;
 
-  /* Start for MATLABSystem: '<S4>/Encoder' */
+  /* Start for MATLABSystem: '<S9>/PWM' */
+  pr2_US_hap_DW.obj_a.matlabCodegenIsDeleted = false;
+  pr2_US_hap_DW.obj_a.isInitialized = 1L;
+  pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL, 0.0, 0.0);
+  pr2_US_hap_DW.obj_a.isSetupComplete = true;
+
+  /* Start for MATLABSystem: '<S3>/PWM' */
+  pr2_US_hap_DW.obj_l.matlabCodegenIsDeleted = false;
+  pr2_US_hap_DW.obj_l.isInitialized = 1L;
+  pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(9UL, 0.0, 0.0);
+  pr2_US_hap_DW.obj_l.isSetupComplete = true;
+
+  /* Start for MATLABSystem: '<S3>/PWM1' */
+  pr2_US_hap_DW.obj_g.matlabCodegenIsDeleted = false;
+  pr2_US_hap_DW.obj_g.isInitialized = 1L;
+  pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(10UL, 0.0, 0.0);
+  pr2_US_hap_DW.obj_g.isSetupComplete = true;
+
+  /* Start for MATLABSystem: '<S3>/PWM2' */
+  pr2_US_hap_DW.obj_e.matlabCodegenIsDeleted = false;
+  pr2_US_hap_DW.obj_e.isInitialized = 1L;
+  pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(4UL, 0.0, 0.0);
+  pr2_US_hap_DW.obj_e.isSetupComplete = true;
+
+  /* Start for MATLABSystem: '<S8>/Encoder' */
+  pr2_US_hap_DW.obj_p.Index = 0U;
+  pr2_US_hap_DW.obj_p.matlabCodegenIsDeleted = false;
+  pr2_US_hap_DW.obj_p.SampleTime = pr2_US_hap_P.Encoder_SampleTime;
+  pr2_US_hap_DW.obj_p.isInitialized = 1L;
+  MW_EncoderSetup(18UL, 19UL, &pr2_US_hap_DW.obj_p.Index);
+  pr2_US_hap_DW.obj_p.isSetupComplete = true;
+  pr2_US_hap_DW.obj_p.TunablePropsChanged = false;
+
+  /* InitializeConditions for MATLABSystem: '<S8>/Encoder' */
+  MW_EncoderReset(pr2_US_hap_DW.obj_p.Index);
+
+  /* Start for MATLABSystem: '<S12>/Encoder' */
   pr2_US_hap_DW.obj.Index = 0U;
   pr2_US_hap_DW.obj.matlabCodegenIsDeleted = false;
-  pr2_US_hap_DW.obj.SampleTime = pr2_US_hap_P.Encoder_SampleTime;
+  pr2_US_hap_DW.obj.SampleTime = pr2_US_hap_P.Encoder_SampleTime_e;
   pr2_US_hap_DW.obj.isInitialized = 1L;
   MW_EncoderSetup(20UL, 21UL, &pr2_US_hap_DW.obj.Index);
   pr2_US_hap_DW.obj.isSetupComplete = true;
   pr2_US_hap_DW.obj.TunablePropsChanged = false;
 
-  /* InitializeConditions for MATLABSystem: '<S4>/Encoder' */
+  /* InitializeConditions for MATLABSystem: '<S12>/Encoder' */
   MW_EncoderReset(pr2_US_hap_DW.obj.Index);
-
-  /* Start for MATLABSystem: '<Root>/우측 초음파' */
-  pr2_US_hap_DW.obj_hy.isInitialized = 1L;
-  MW_UltrasonicSetup(52, 53);
-  pr2_US_hap_DW.obj_hy.TunablePropsChanged = false;
-
-  /* Start for MATLABSystem: '<Root>/전방 초음파' */
-  pr2_US_hap_DW.obj_p.isInitialized = 1L;
-  MW_UltrasonicSetup(46, 47);
-  pr2_US_hap_DW.obj_p.TunablePropsChanged = false;
-
-  /* Start for MATLABSystem: '<Root>/좌측 초음파' */
-  pr2_US_hap_DW.obj_h.isInitialized = 1L;
-  MW_UltrasonicSetup(50, 51);
-  pr2_US_hap_DW.obj_h.TunablePropsChanged = false;
-
-  /* Start for MATLABSystem: '<Root>/후방 초음파' */
-  pr2_US_hap_DW.obj_g.isInitialized = 1L;
-  MW_UltrasonicSetup(48, 49);
-  pr2_US_hap_DW.obj_g.TunablePropsChanged = false;
+  pr2_US_hap_SW1PUSH1_Init();
 }
 
 /* Model terminate function */
@@ -2192,26 +2276,90 @@ void pr2_US_hap_terminate(void)
     if ((pr2_US_hap_DW.obj_n.isInitialized == 1L) &&
         pr2_US_hap_DW.obj_n.isSetupComplete) {
       pr2_US_hap_DW.obj_n.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
-        MW_AnalogIn_GetHandle(54UL);
+        MW_AnalogIn_GetHandle(62UL);
       MW_AnalogIn_Close(pr2_US_hap_DW.obj_n.AnalogInDriverObj.MW_ANALOGIN_HANDLE);
     }
   }
 
   /* End of Terminate for MATLABSystem: '<Root>/가변저항' */
-  /* Terminate for MATLABSystem: '<S5>/PWM' */
-  if (!pr2_US_hap_DW.obj_b.matlabCodegenIsDeleted) {
-    pr2_US_hap_DW.obj_b.matlabCodegenIsDeleted = true;
-    if ((pr2_US_hap_DW.obj_b.isInitialized == 1L) &&
-        pr2_US_hap_DW.obj_b.isSetupComplete) {
-      pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
-      MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE, 0.0);
-      pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
-      MW_PWM_Close(pr2_US_hap_DW.obj_b.PWMDriverObj.MW_PWM_HANDLE);
+  /* Terminate for MATLABSystem: '<S13>/PWM' */
+  if (!pr2_US_hap_DW.obj_d.matlabCodegenIsDeleted) {
+    pr2_US_hap_DW.obj_d.matlabCodegenIsDeleted = true;
+    if ((pr2_US_hap_DW.obj_d.isInitialized == 1L) &&
+        pr2_US_hap_DW.obj_d.isSetupComplete) {
+      pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(3UL);
+      MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(3UL);
+      MW_PWM_Close(pr2_US_hap_DW.obj_d.PWMDriverObj.MW_PWM_HANDLE);
     }
   }
 
-  /* End of Terminate for MATLABSystem: '<S5>/PWM' */
-  /* Terminate for MATLABSystem: '<S4>/Encoder' */
+  /* End of Terminate for MATLABSystem: '<S13>/PWM' */
+  /* Terminate for MATLABSystem: '<S9>/PWM' */
+  if (!pr2_US_hap_DW.obj_a.matlabCodegenIsDeleted) {
+    pr2_US_hap_DW.obj_a.matlabCodegenIsDeleted = true;
+    if ((pr2_US_hap_DW.obj_a.isInitialized == 1L) &&
+        pr2_US_hap_DW.obj_a.isSetupComplete) {
+      pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
+      MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
+      MW_PWM_Close(pr2_US_hap_DW.obj_a.PWMDriverObj.MW_PWM_HANDLE);
+    }
+  }
+
+  /* End of Terminate for MATLABSystem: '<S9>/PWM' */
+  /* Terminate for MATLABSystem: '<S3>/PWM' */
+  if (!pr2_US_hap_DW.obj_l.matlabCodegenIsDeleted) {
+    pr2_US_hap_DW.obj_l.matlabCodegenIsDeleted = true;
+    if ((pr2_US_hap_DW.obj_l.isInitialized == 1L) &&
+        pr2_US_hap_DW.obj_l.isSetupComplete) {
+      pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(9UL);
+      MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(9UL);
+      MW_PWM_Close(pr2_US_hap_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE);
+    }
+  }
+
+  /* End of Terminate for MATLABSystem: '<S3>/PWM' */
+
+  /* Terminate for MATLABSystem: '<S3>/PWM1' */
+  if (!pr2_US_hap_DW.obj_g.matlabCodegenIsDeleted) {
+    pr2_US_hap_DW.obj_g.matlabCodegenIsDeleted = true;
+    if ((pr2_US_hap_DW.obj_g.isInitialized == 1L) &&
+        pr2_US_hap_DW.obj_g.isSetupComplete) {
+      pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(10UL);
+      MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(10UL);
+      MW_PWM_Close(pr2_US_hap_DW.obj_g.PWMDriverObj.MW_PWM_HANDLE);
+    }
+  }
+
+  /* End of Terminate for MATLABSystem: '<S3>/PWM1' */
+
+  /* Terminate for MATLABSystem: '<S3>/PWM2' */
+  if (!pr2_US_hap_DW.obj_e.matlabCodegenIsDeleted) {
+    pr2_US_hap_DW.obj_e.matlabCodegenIsDeleted = true;
+    if ((pr2_US_hap_DW.obj_e.isInitialized == 1L) &&
+        pr2_US_hap_DW.obj_e.isSetupComplete) {
+      pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(4UL);
+      MW_PWM_SetDutyCycle(pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(4UL);
+      MW_PWM_Close(pr2_US_hap_DW.obj_e.PWMDriverObj.MW_PWM_HANDLE);
+    }
+  }
+
+  /* End of Terminate for MATLABSystem: '<S3>/PWM2' */
+  /* Terminate for MATLABSystem: '<S8>/Encoder' */
+  if (!pr2_US_hap_DW.obj_p.matlabCodegenIsDeleted) {
+    pr2_US_hap_DW.obj_p.matlabCodegenIsDeleted = true;
+    if ((pr2_US_hap_DW.obj_p.isInitialized == 1L) &&
+        pr2_US_hap_DW.obj_p.isSetupComplete) {
+      MW_EncoderRelease();
+    }
+  }
+
+  /* End of Terminate for MATLABSystem: '<S8>/Encoder' */
+  /* Terminate for MATLABSystem: '<S12>/Encoder' */
   if (!pr2_US_hap_DW.obj.matlabCodegenIsDeleted) {
     pr2_US_hap_DW.obj.matlabCodegenIsDeleted = true;
     if ((pr2_US_hap_DW.obj.isInitialized == 1L) &&
@@ -2220,7 +2368,7 @@ void pr2_US_hap_terminate(void)
     }
   }
 
-  /* End of Terminate for MATLABSystem: '<S4>/Encoder' */
+  /* End of Terminate for MATLABSystem: '<S12>/Encoder' */
 }
 
 /*

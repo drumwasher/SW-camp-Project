@@ -7,9 +7,9 @@
  *
  * Code generation for model "pr2_US_hap".
  *
- * Model version              : 1.10
+ * Model version              : 1.12
  * Simulink Coder version : 23.2 (R2023b) 01-Aug-2023
- * C source code generated on : Mon Feb 12 17:15:10 2024
+ * C source code generated on : Tue Feb 13 17:45:30 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

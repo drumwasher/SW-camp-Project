@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'pr2_US_hap'.
  *
- * Model version                  : 1.10
+ * Model version                  : 1.12
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Mon Feb 12 17:15:10 2024
+ * C/C++ source code generated on : Tue Feb 13 17:45:30 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -24,28 +24,15 @@
 #include "MW_target_hardware_resources.h"
 
 volatile int IsrOverrun = 0;
-boolean_T isRateRunning[3] = { 0, 0, 0 };
-
-boolean_T need2runFlags[3] = { 0, 0, 0 };
-
+static boolean_T OverrunFlag = 0;
 void rt_OneStep(void)
 {
-  extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T) 0;
-  boolean_T eventFlags[3];
-
-  /* Check base rate for overrun */
-  if (isRateRunning[0]++) {
+  /* Check for overrun. Protect OverrunFlag against preemption */
+  if (OverrunFlag++) {
     IsrOverrun = 1;
-    isRateRunning[0]--;                /* allow future iterations to succeed*/
+    OverrunFlag--;
     return;
   }
-
-  /*
-   * For a bare-board target (i.e., no operating system), the rates
-   * that execute this base step are buffered locally to allow for
-   * overlapping preemption.
-   */
-  pr2_US_hap_SetEventsForThisBaseStep(eventFlags);
 
 #ifndef _MW_ARDUINO_LOOP_
 
@@ -53,7 +40,7 @@ void rt_OneStep(void)
 
 #endif;
 
-  pr2_US_hap_step0();
+  pr2_US_hap_step();
 
   /* Get model outputs here */
 #ifndef _MW_ARDUINO_LOOP_
@@ -62,57 +49,7 @@ void rt_OneStep(void)
 
 #endif;
 
-  isRateRunning[0]--;
-  if (eventFlags[2]) {
-    if (need2runFlags[2]++) {
-      IsrOverrun = 1;
-      need2runFlags[2]--;              /* allow future iterations to succeed*/
-      return;
-    }
-  }
-
-  if (need2runFlags[2]) {
-    if (isRateRunning[1]) {
-      /* Yield to higher priority*/
-      return;
-    }
-
-    isRateRunning[2]++;
-
-#ifndef _MW_ARDUINO_LOOP_
-
-    sei();
-
-#endif;
-
-    /* Step the model for subrate "2" */
-    switch (2)
-    {
-     case 2 :
-      currentTime = (extmodeSimulationTime_T) ((pr2_US_hap_M->Timing.clockTick2 *
-        10) + 0)
-        ;
-      pr2_US_hap_step2();
-
-      /* Get model outputs here */
-
-      /* Trigger External Mode event */
-      extmodeEvent(2, currentTime);
-      break;
-
-     default :
-      break;
-    }
-
-#ifndef _MW_ARDUINO_LOOP_
-
-    cli();
-
-#endif;
-
-    need2runFlags[2]--;
-    isRateRunning[2]--;
-  }
+  OverrunFlag--;
 }
 
 extern void rtIOStreamResync();

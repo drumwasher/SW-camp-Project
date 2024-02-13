@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'motor_ctrl_with_PID'.
  *
- * Model version                  : 1.37
+ * Model version                  : 1.38
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Mon Feb 12 21:58:13 2024
+ * C/C++ source code generated on : Tue Feb 13 21:22:30 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -21,8 +21,8 @@
 #define RTW_HEADER_motor_ctrl_with_PID_private_h_
 #include "rtwtypes.h"
 #include "multiword_types.h"
-#include "motor_ctrl_with_PID_types.h"
 #include "motor_ctrl_with_PID.h"
+#include "motor_ctrl_with_PID_types.h"
 #include "rtw_continuous.h"
 #include "rtw_solver.h"
 
@@ -91,7 +91,6 @@ Verification pane for ERT based targets, which will disable the \
 preprocessor word size checks.
 #endif
 
-extern real_T rt_roundd_snf(real_T u);
 extern void sMultiWordMul(const uint32_T u1[], int16_T n1, const uint32_T u2[],
   int16_T n2, uint32_T y[], int16_T n);
 extern real_T sMultiWord2Double(const uint32_T u1[], int16_T n1, int16_T e1);
@@ -118,6 +117,9 @@ extern int16_T uMultiWordDiv(uint32_T a[], int16_T na, uint32_T b[], int16_T nb,
 extern boolean_T sMultiWordGe(const uint32_T u1[], const uint32_T u2[], int16_T
   n);
 extern int16_T sMultiWordCmp(const uint32_T u1[], const uint32_T u2[], int16_T n);
+extern void motor_ctrl_w_IfActionSubsystem1(RT_MODEL_motor_ctrl_with_PID_T *
+  const motor_ctrl_with_PID_M, real_T *rty_Out1, real_T *rty_Out2,
+  P_IfActionSubsystem1_motor_ct_T *localP);
 
 /* private model entry point functions */
 extern void motor_ctrl_with_PID_derivatives(void);

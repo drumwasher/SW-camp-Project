@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'pr2_US_hap'.
  *
- * Model version                  : 1.10
+ * Model version                  : 1.12
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Mon Feb 12 17:15:10 2024
+ * C/C++ source code generated on : Tue Feb 13 17:45:30 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -92,10 +92,12 @@ preprocessor word size checks.
 #endif
 
 void MW_ISR_2(void);
-void MW_ISR_3(void);
 extern void sMultiWordMul(const uint32_T u1[], int16_T n1, const uint32_T u2[],
   int16_T n2, uint32_T y[], int16_T n);
 extern real_T sMultiWord2Double(const uint32_T u1[], int16_T n1, int16_T e1);
+extern int32_T MultiWord2sLong(const uint32_T u[]);
+extern void sMultiWordShr(const uint32_T u1[], int16_T n1, uint16_T n2, uint32_T
+  y[], int16_T n);
 extern void sMultiWordShl(const uint32_T u1[], int16_T n1, uint16_T n2, uint32_T
   y[], int16_T n);
 extern void sLong2MultiWord(int32_T u, uint32_T y[], int16_T n);
@@ -116,9 +118,7 @@ extern int16_T uMultiWordDiv(uint32_T a[], int16_T na, uint32_T b[], int16_T nb,
 extern boolean_T sMultiWordGe(const uint32_T u1[], const uint32_T u2[], int16_T
   n);
 extern int16_T sMultiWordCmp(const uint32_T u1[], const uint32_T u2[], int16_T n);
-extern int32_T MultiWord2sLong(const uint32_T u[]);
-extern void sMultiWordShr(const uint32_T u1[], int16_T n1, uint16_T n2, uint32_T
-  y[], int16_T n);
+extern void pr2_US_hap_SW1PUSH1_Init(void);
 
 /* private model entry point functions */
 extern void pr2_US_hap_derivatives(void);
