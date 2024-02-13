@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'motor_ctrl_with_PID'.
  *
- * Model version                  : 1.32
+ * Model version                  : 1.37
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb 10 22:03:59 2024
+ * C/C++ source code generated on : Mon Feb 12 21:58:13 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -20,12 +20,18 @@
 #include "motor_ctrl_with_PID.h"
 #include <math.h>
 #include "rt_nonfinite.h"
+#include "motor_ctrl_with_PID_private.h"
 #include "rtwtypes.h"
 #include "multiword_types.h"
-#include "motor_ctrl_with_PID_private.h"
 
 /* Block signals (default storage) */
 B_motor_ctrl_with_PID_T motor_ctrl_with_PID_B;
+
+/* Continuous states */
+X_motor_ctrl_with_PID_T motor_ctrl_with_PID_X;
+
+/* Disabled State Vector */
+XDis_motor_ctrl_with_PID_T motor_ctrl_with_PID_XDis;
 
 /* Block states (default storage) */
 DW_motor_ctrl_with_PID_T motor_ctrl_with_PID_DW;
@@ -119,6 +125,34 @@ void sMultiWordMul(const uint32_T u1[], int16_T n1, const uint32_T u2[], int16_T
       cb = (uint32_T)(yk < cb);
     }
   }
+}
+
+real_T sMultiWord2Double(const uint32_T u1[], int16_T n1, int16_T e1)
+{
+  real_T y;
+  uint32_T cb;
+  uint32_T u1i;
+  int16_T exp_0;
+  int16_T i;
+  y = 0.0;
+  exp_0 = e1;
+  if ((u1[n1 - 1] & 2147483648UL) != 0UL) {
+    cb = 1UL;
+    for (i = 0; i < n1; i++) {
+      u1i = ~u1[i];
+      cb += u1i;
+      y -= ldexp(cb, exp_0);
+      cb = (uint32_T)(cb < u1i);
+      exp_0 += 32;
+    }
+  } else {
+    for (i = 0; i < n1; i++) {
+      y += ldexp(u1[i], exp_0);
+      exp_0 += 32;
+    }
+  }
+
+  return y;
 }
 
 int32_T MultiWord2sLong(const uint32_T u[])
@@ -669,60 +703,295 @@ int16_T sMultiWordCmp(const uint32_T u1[], const uint32_T u2[], int16_T n)
   return y;
 }
 
+/*
+ * This function updates continuous states using the ODE3 fixed-step
+ * solver algorithm
+ */
+static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
+{
+  /* Solver Matrices */
+  static const real_T rt_ODE3_A[3] = {
+    1.0/2.0, 3.0/4.0, 1.0
+  };
+
+  static const real_T rt_ODE3_B[3][3] = {
+    { 1.0/2.0, 0.0, 0.0 },
+
+    { 0.0, 3.0/4.0, 0.0 },
+
+    { 2.0/9.0, 1.0/3.0, 4.0/9.0 }
+  };
+
+  time_T t = rtsiGetT(si);
+  time_T tnew = rtsiGetSolverStopTime(si);
+  time_T h = rtsiGetStepSize(si);
+  real_T *x = rtsiGetContStates(si);
+  ODE3_IntgData *id = (ODE3_IntgData *)rtsiGetSolverData(si);
+  real_T *y = id->y;
+  real_T *f0 = id->f[0];
+  real_T *f1 = id->f[1];
+  real_T *f2 = id->f[2];
+  real_T hB[3];
+  int_T i;
+  int_T nXc = 1;
+  rtsiSetSimTimeStep(si,MINOR_TIME_STEP);
+
+  /* Save the state values at time t in y, we'll use x as ynew. */
+  (void) memcpy(y, x,
+                (uint_T)nXc*sizeof(real_T));
+
+  /* Assumes that rtsiSetT and ModelOutputs are up-to-date */
+  /* f0 = f(t,y) */
+  rtsiSetdX(si, f0);
+  motor_ctrl_with_PID_derivatives();
+
+  /* f(:,2) = feval(odefile, t + hA(1), y + f*hB(:,1), args(:)(*)); */
+  hB[0] = h * rt_ODE3_B[0][0];
+  for (i = 0; i < nXc; i++) {
+    x[i] = y[i] + (f0[i]*hB[0]);
+  }
+
+  rtsiSetT(si, t + h*rt_ODE3_A[0]);
+  rtsiSetdX(si, f1);
+  motor_ctrl_with_PID_step();
+  motor_ctrl_with_PID_derivatives();
+
+  /* f(:,3) = feval(odefile, t + hA(2), y + f*hB(:,2), args(:)(*)); */
+  for (i = 0; i <= 1; i++) {
+    hB[i] = h * rt_ODE3_B[1][i];
+  }
+
+  for (i = 0; i < nXc; i++) {
+    x[i] = y[i] + (f0[i]*hB[0] + f1[i]*hB[1]);
+  }
+
+  rtsiSetT(si, t + h*rt_ODE3_A[1]);
+  rtsiSetdX(si, f2);
+  motor_ctrl_with_PID_step();
+  motor_ctrl_with_PID_derivatives();
+
+  /* tnew = t + hA(3);
+     ynew = y + f*hB(:,3); */
+  for (i = 0; i <= 2; i++) {
+    hB[i] = h * rt_ODE3_B[2][i];
+  }
+
+  for (i = 0; i < nXc; i++) {
+    x[i] = y[i] + (f0[i]*hB[0] + f1[i]*hB[1] + f2[i]*hB[2]);
+  }
+
+  rtsiSetT(si, tnew);
+  rtsiSetSimTimeStep(si,MAJOR_TIME_STEP);
+}
+
+real_T rt_roundd_snf(real_T u)
+{
+  real_T y;
+  if (fabs(u) < 4.503599627370496E+15) {
+    if (u >= 0.5) {
+      y = floor(u + 0.5);
+    } else if (u > -0.5) {
+      y = u * 0.0;
+    } else {
+      y = ceil(u - 0.5);
+    }
+  } else {
+    y = u;
+  }
+
+  return y;
+}
+
 /* Model step function */
 void motor_ctrl_with_PID_step(void)
 {
   /* local block i/o variables */
   int32_T rtb_TSamp;
+  if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+    /* set solver stop time */
+    rtsiSetSolverStopTime(&motor_ctrl_with_PID_M->solverInfo,
+                          ((motor_ctrl_with_PID_M->Timing.clockTick0+1)*
+      motor_ctrl_with_PID_M->Timing.stepSize0));
+  }                                    /* end MajorTimeStep */
+
+  /* Update absolute time of base rate at minor time step */
+  if (rtmIsMinorTimeStep(motor_ctrl_with_PID_M)) {
+    motor_ctrl_with_PID_M->Timing.t[0] = rtsiGetT
+      (&motor_ctrl_with_PID_M->solverInfo);
+  }
 
   {
-    int128m_T tmp_2;
-    int128m_T tmp_3;
-    real_T tmp;
+    real_T lastTime;
+    real_T rtb_Add3;
+    real_T rtb_Gain1;
+    real_T *lastU;
+    int32_T tmp;
     uint32_T tmp_0;
     uint32_T tmp_1;
-    static const int64m_T tmp_4 = { { 0UL, 0UL }/* chunks */
+    uint16_T b_varargout_1;
+    uint8_T tmp_2;
+    static const int64m_T tmp_3 = { { 0UL, 0UL }/* chunks */
     };
 
-    static const int64m_T tmp_5 = { { 25UL, 0UL }/* chunks */
+    static const int64m_T tmp_4 = { { 25UL, 0UL }/* chunks */
     };
 
-    /* Step: '<S1>/Step2' */
-    if (motor_ctrl_with_PID_M->Timing.t[0] < motor_ctrl_with_PID_P.Step2_Time) {
-      /* DataTypeConversion: '<S1>/Data Type Conversion' */
-      tmp = floor(motor_ctrl_with_PID_P.Step2_Y0);
-      if (rtIsNaN(tmp) || rtIsInf(tmp)) {
-        tmp = 0.0;
-      } else {
-        tmp = fmod(tmp, 256.0);
-      }
-
-      /* DataTypeConversion: '<S1>/Data Type Conversion' */
-      motor_ctrl_with_PID_B.DataTypeConversion = (uint8_T)(tmp < 0.0 ? (int16_T)
-        (uint8_T)-(int8_T)(uint8_T)-tmp : (int16_T)(uint8_T)tmp);
+    /* Step: '<Root>/Step1' */
+    if (motor_ctrl_with_PID_M->Timing.t[0] < motor_ctrl_with_PID_P.Step1_Time) {
+      /* Step: '<Root>/Step1' */
+      motor_ctrl_with_PID_B.Step1 = motor_ctrl_with_PID_P.Step1_Y0;
     } else {
-      /* DataTypeConversion: '<S1>/Data Type Conversion' */
-      tmp = floor(motor_ctrl_with_PID_P.Wref);
-      if (rtIsNaN(tmp) || rtIsInf(tmp)) {
-        tmp = 0.0;
-      } else {
-        tmp = fmod(tmp, 256.0);
-      }
-
-      /* DataTypeConversion: '<S1>/Data Type Conversion' */
-      motor_ctrl_with_PID_B.DataTypeConversion = (uint8_T)(tmp < 0.0 ? (int16_T)
-        (uint8_T)-(int8_T)(uint8_T)-tmp : (int16_T)(uint8_T)tmp);
+      /* Step: '<Root>/Step1' */
+      motor_ctrl_with_PID_B.Step1 = motor_ctrl_with_PID_P.Wref;
     }
 
-    /* End of Step: '<S1>/Step2' */
+    /* End of Step: '<Root>/Step1' */
 
-    /* MATLABSystem: '<S1>/PWM' */
-    motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
+    /* MATLABSystem: '<Root>/Analog Input' */
+    if (motor_ctrl_with_PID_DW.obj_j.SampleTime !=
+        motor_ctrl_with_PID_P.AnalogInput_SampleTime) {
+      motor_ctrl_with_PID_DW.obj_j.SampleTime =
+        motor_ctrl_with_PID_P.AnalogInput_SampleTime;
+    }
+
+    motor_ctrl_with_PID_DW.obj_j.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
+      MW_AnalogIn_GetHandle(62UL);
+    MW_AnalogInSingle_ReadResult
+      (motor_ctrl_with_PID_DW.obj_j.AnalogInDriverObj.MW_ANALOGIN_HANDLE,
+       &b_varargout_1, MW_ANALOGIN_UINT16);
+
+    /* Product: '<Root>/Divide1' incorporates:
+     *  Constant: '<Root>/Constant'
+     *  Constant: '<Root>/Constant1'
+     *  DataTypeConversion: '<Root>/Data Type Conversion'
+     *  Gain: '<Root>/Gain'
+     *  MATLABSystem: '<Root>/Analog Input'
+     *  Sum: '<Root>/Add2'
+     * */
+    motor_ctrl_with_PID_B.Divide1 = ((real_T)(uint8_T)(((uint32_T)
+      motor_ctrl_with_PID_P.Gain_Gain * b_varargout_1) >> 17) -
+      motor_ctrl_with_PID_P.Constant_Value) /
+      motor_ctrl_with_PID_P.Constant1_Value;
+
+    /* Sum: '<Root>/Add4' incorporates:
+     *  Constant: '<Root>/Constant2'
+     *  Product: '<Root>/Divide2'
+     *  Product: '<Root>/Divide3'
+     */
+    motor_ctrl_with_PID_B.Add4 = motor_ctrl_with_PID_B.Divide1 /
+      motor_ctrl_with_PID_P.Constant2_Value * motor_ctrl_with_PID_B.Step1 +
+      motor_ctrl_with_PID_B.Step1;
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+      /* DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+      motor_ctrl_with_PID_B.DiscreteTransferFcn = tmp_3;
+
+      /* DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+      tmp_0 = (uint32_T)motor_ctrl_with_PID_P.num_Gd[1L];
+      tmp_1 = (uint32_T)motor_ctrl_with_PID_DW.DiscreteTransferFcn_states;
+      sMultiWordMul(&tmp_0, 1, &tmp_1, 1,
+                    &motor_ctrl_with_PID_B.DiscreteTransferFcn.chunks[0U], 2);
+    }
+
+    /* Sum: '<Root>/Add3' incorporates:
+     *  DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn'
+     */
+    rtb_Add3 = motor_ctrl_with_PID_B.Add4 - sMultiWord2Double
+      (&motor_ctrl_with_PID_B.DiscreteTransferFcn.chunks[0U], 2, 0) *
+      1.1641532182693481E-10;
+
+    /* Gain: '<S3>/Gain3' */
+    motor_ctrl_with_PID_B.Gain3 = motor_ctrl_with_PID_P.KD * rtb_Add3;
+
+    /* Derivative: '<S3>/Derivative2' */
+    rtb_Gain1 = motor_ctrl_with_PID_M->Timing.t[0];
+    if ((motor_ctrl_with_PID_DW.TimeStampA >= rtb_Gain1) &&
+        (motor_ctrl_with_PID_DW.TimeStampB >= rtb_Gain1)) {
+      rtb_Gain1 = 0.0;
+    } else {
+      lastTime = motor_ctrl_with_PID_DW.TimeStampA;
+      lastU = &motor_ctrl_with_PID_DW.LastUAtTimeA;
+      if (motor_ctrl_with_PID_DW.TimeStampA < motor_ctrl_with_PID_DW.TimeStampB)
+      {
+        if (motor_ctrl_with_PID_DW.TimeStampB < rtb_Gain1) {
+          lastTime = motor_ctrl_with_PID_DW.TimeStampB;
+          lastU = &motor_ctrl_with_PID_DW.LastUAtTimeB;
+        }
+      } else if (motor_ctrl_with_PID_DW.TimeStampA >= rtb_Gain1) {
+        lastTime = motor_ctrl_with_PID_DW.TimeStampB;
+        lastU = &motor_ctrl_with_PID_DW.LastUAtTimeB;
+      }
+
+      rtb_Gain1 = (motor_ctrl_with_PID_B.Gain3 - *lastU) / (rtb_Gain1 - lastTime);
+    }
+
+    /* End of Derivative: '<S3>/Derivative2' */
+
+    /* Sum: '<S3>/Subtract2' incorporates:
+     *  Gain: '<S3>/Gain2'
+     *  Integrator: '<S3>/Integrator2'
+     */
+    motor_ctrl_with_PID_B.Subtract2 = (motor_ctrl_with_PID_P.KP * rtb_Add3 +
+      motor_ctrl_with_PID_X.Integrator2_CSTATE) + rtb_Gain1;
+
+    /* Saturate: '<Root>/Saturation1' */
+    if (motor_ctrl_with_PID_B.Subtract2 >
+        motor_ctrl_with_PID_P.Saturation1_UpperSat) {
+      /* Saturate: '<Root>/Saturation1' */
+      motor_ctrl_with_PID_B.Saturation1 =
+        motor_ctrl_with_PID_P.Saturation1_UpperSat;
+    } else if (motor_ctrl_with_PID_B.Subtract2 <
+               motor_ctrl_with_PID_P.Saturation1_LowerSat) {
+      /* Saturate: '<Root>/Saturation1' */
+      motor_ctrl_with_PID_B.Saturation1 =
+        motor_ctrl_with_PID_P.Saturation1_LowerSat;
+    } else {
+      /* Saturate: '<Root>/Saturation1' */
+      motor_ctrl_with_PID_B.Saturation1 = motor_ctrl_with_PID_B.Subtract2;
+    }
+
+    /* End of Saturate: '<Root>/Saturation1' */
+
+    /* DataTypeConversion: '<S2>/Data Type Conversion' incorporates:
+     *  Gain: '<S2>/Gain1'
+     */
+    rtb_Gain1 = floor(255.0 / motor_ctrl_with_PID_P.Vlim *
+                      motor_ctrl_with_PID_B.Saturation1);
+    if (rtIsNaN(rtb_Gain1) || rtIsInf(rtb_Gain1)) {
+      rtb_Gain1 = 0.0;
+    } else {
+      rtb_Gain1 = fmod(rtb_Gain1, 256.0);
+    }
+
+    /* DataTypeConversion: '<S2>/Data Type Conversion' */
+    motor_ctrl_with_PID_B.DataTypeConversion = (uint8_T)(rtb_Gain1 < 0.0 ?
+      (int16_T)(uint8_T)-(int8_T)(uint8_T)-rtb_Gain1 : (int16_T)(uint8_T)
+      rtb_Gain1);
+
+    /* DataTypeConversion: '<S2>/Data Type Conversion1' */
+    motor_ctrl_with_PID_B.DataTypeConversion1 =
+      motor_ctrl_with_PID_B.DataTypeConversion;
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+      /* SignalConversion generated from: '<Root>/Mux2' */
+      motor_ctrl_with_PID_B.TmpSignalConversionAtTAQSigLogg[0] =
+        motor_ctrl_with_PID_B.Step1;
+      motor_ctrl_with_PID_B.TmpSignalConversionAtTAQSigLogg[1] =
+        motor_ctrl_with_PID_B.DataTypeConversion1;
+    }
+
+    /* MATLABSystem: '<S2>/PWM' */
+    motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
       (11UL);
-    MW_PWM_SetDutyCycle(motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE,
+    MW_PWM_SetDutyCycle(motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE,
                         (real_T)motor_ctrl_with_PID_B.DataTypeConversion);
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+    }
 
-    /* MATLABSystem: '<S2>/Encoder' */
+    /* Gain: '<S3>/Gain1' */
+    motor_ctrl_with_PID_B.Gain1_e = motor_ctrl_with_PID_P.KI * rtb_Add3;
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+    }
+
+    /* MATLABSystem: '<S1>/Encoder' */
     if (motor_ctrl_with_PID_DW.obj.SampleTime !=
         motor_ctrl_with_PID_P.Encoder_SampleTime) {
       motor_ctrl_with_PID_DW.obj.SampleTime =
@@ -733,193 +1002,244 @@ void motor_ctrl_with_PID_step(void)
       motor_ctrl_with_PID_DW.obj.TunablePropsChanged = false;
     }
 
-    /* SampleTimeMath: '<S3>/TSamp' incorporates:
-     *  MATLABSystem: '<S2>/Encoder'
-     * *
-     * About '<S3>/TSamp':
-     *  y = u * K where K = 1 / ( w * Ts )
-     *  Multiplication by K = weightedTsampQuantized is being
-     *  done implicitly by changing the scaling of the input signal.
-     *  No work needs to be done here.  Downstream blocks may need
-     *  to do work to handle the scaling of the output; this happens
-     *  automatically.
-     */
-    MW_EncoderRead(motor_ctrl_with_PID_DW.obj.Index, &rtb_TSamp);
+    MW_EncoderRead(motor_ctrl_with_PID_DW.obj.Index, &tmp);
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+      /* SampleTimeMath: '<S4>/TSamp' incorporates:
+       *  MATLABSystem: '<S1>/Encoder'
+       *
+       * About '<S4>/TSamp':
+       *  y = u * K where K = 1 / ( w * Ts )
+       *  Multiplication by K = weightedTsampQuantized is being
+       *  done implicitly by changing the scaling of the input signal.
+       *  No work needs to be done here.  Downstream blocks may need
+       *  to do work to handle the scaling of the output; this happens
+       *  automatically.
+       */
+      rtb_TSamp = tmp;
 
-    /* Gain: '<S2>/Gain1' incorporates:
-     *  SampleTimeMath: '<S3>/TSamp'
-     *  Sum: '<S3>/Diff'
-     *  UnitDelay: '<S3>/UD'
-     *
-     * About '<S3>/TSamp':
-     *  y = u * K where K = 1 / ( w * Ts )
-     *  Multiplication by K = weightedTsampQuantized is being
-     *  done implicitly by changing the scaling of the input signal.
-     *  No work needs to be done here.  Downstream blocks may need
-     *  to do work to handle the scaling of the output; this happens
-     *  automatically.
-     *
-     * Block description for '<S3>/Diff':
-     *
-     *  Add in CPU
-     *
-     * Block description for '<S3>/UD':
-     *
-     *  Store in Global RAM
-     */
-    tmp_0 = (uint32_T)motor_ctrl_with_PID_P.encoder_scale;
-    tmp_1 = (uint32_T)(rtb_TSamp - motor_ctrl_with_PID_DW.UD_DSTATE);
-    sMultiWordMul(&tmp_0, 1, &tmp_1, 1, &motor_ctrl_with_PID_B.Gain1.chunks[0U],
-                  2);
+      /* Gain: '<S1>/Gain1' incorporates:
+       *  SampleTimeMath: '<S4>/TSamp'
+       *  Sum: '<S4>/Diff'
+       *  UnitDelay: '<S4>/UD'
+       *
+       * About '<S4>/TSamp':
+       *  y = u * K where K = 1 / ( w * Ts )
+       *  Multiplication by K = weightedTsampQuantized is being
+       *  done implicitly by changing the scaling of the input signal.
+       *  No work needs to be done here.  Downstream blocks may need
+       *  to do work to handle the scaling of the output; this happens
+       *  automatically.
+       *
+       * Block description for '<S4>/Diff':
+       *
+       *  Add in CPU
+       *
+       * Block description for '<S4>/UD':
+       *
+       *  Store in Global RAM
+       */
+      tmp_0 = (uint32_T)motor_ctrl_with_PID_P.encoder_scale;
+      tmp_1 = (uint32_T)(rtb_TSamp - motor_ctrl_with_PID_DW.UD_DSTATE);
+      sMultiWordMul(&tmp_0, 1, &tmp_1, 1, &motor_ctrl_with_PID_B.Gain1.chunks[0U],
+                    2);
 
-    /* Gain: '<S2>/Gain2' incorporates:
-     *  Gain: '<S2>/Gain1'
-     */
-    sMultiWordMul(&motor_ctrl_with_PID_P.Gain2_Gain.chunks[0U], 2,
-                  &motor_ctrl_with_PID_B.Gain1.chunks[0U], 2,
-                  &motor_ctrl_with_PID_B.Gain2.chunks[0U], 4);
+      /* Gain: '<S1>/Gain2' incorporates:
+       *  Gain: '<S1>/Gain1'
+       */
+      sMultiWordMul(&motor_ctrl_with_PID_P.Gain2_Gain.chunks[0U], 2,
+                    &motor_ctrl_with_PID_B.Gain1.chunks[0U], 2,
+                    &motor_ctrl_with_PID_B.Gain2.chunks[0U], 4);
 
-    /* DataTypeConversion: '<S2>/Data Type Conversion1' incorporates:
-     *  Gain: '<S2>/Gain1'
-     */
-    sMultiWordMul(&motor_ctrl_with_PID_B.Gain1.chunks[0U], 2, &tmp_5.chunks[0U],
-                  2, &tmp_3.chunks[0U], 4);
-    sMultiWordShr(&tmp_3.chunks[0U], 4, 31U, &tmp_2.chunks[0U], 4);
+      /* DataTypeConversion: '<S1>/Data Type Conversion1' incorporates:
+       *  Gain: '<S1>/Gain1'
+       */
+      sMultiWordMul(&motor_ctrl_with_PID_B.Gain1.chunks[0U], 2, &tmp_4.chunks[0U],
+                    2, &motor_ctrl_with_PID_B.r2.chunks[0U], 4);
+      sMultiWordShr(&motor_ctrl_with_PID_B.r2.chunks[0U], 4, 31U,
+                    &motor_ctrl_with_PID_B.r1.chunks[0U], 4);
 
-    /* DataTypeConversion: '<S2>/Data Type Conversion1' */
-    motor_ctrl_with_PID_B.DataTypeConversion1 = MultiWord2sLong(&tmp_2.chunks[0U]);
+      /* DataTypeConversion: '<S1>/Data Type Conversion1' */
+      motor_ctrl_with_PID_B.DataTypeConversion1_m = MultiWord2sLong
+        (&motor_ctrl_with_PID_B.r1.chunks[0U]);
 
-    /* DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
-    motor_ctrl_with_PID_B.DiscreteTransferFcn = tmp_4;
+      /* MATLABSystem: '<Root>/L_Motor(시계)' incorporates:
+       *  Constant: '<Root>/Constant4'
+       */
+      rtb_Gain1 = rt_roundd_snf(motor_ctrl_with_PID_P.Constant4_Value);
+      if (rtb_Gain1 < 256.0) {
+        if (rtb_Gain1 >= 0.0) {
+          tmp_2 = (uint8_T)rtb_Gain1;
+        } else {
+          tmp_2 = 0U;
+        }
+      } else {
+        tmp_2 = MAX_uint8_T;
+      }
 
-    /* DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
-    tmp_0 = (uint32_T)motor_ctrl_with_PID_P.num_Gd[1L];
-    tmp_1 = (uint32_T)motor_ctrl_with_PID_DW.DiscreteTransferFcn_states;
-    sMultiWordMul(&tmp_0, 1, &tmp_1, 1,
-                  &motor_ctrl_with_PID_B.DiscreteTransferFcn.chunks[0U], 2);
+      writeDigitalPin(13, tmp_2);
+
+      /* End of MATLABSystem: '<Root>/L_Motor(시계)' */
+    }
   }
 
-  {
+  if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
     int64m_T denAccum;
     int64m_T denAccum_0;
     int64m_T tmp;
     int64m_T tmp_0;
-    int64m_T tmp_4;
-    int96m_T tmp_3;
+    int64m_T tmp_3;
+    real_T *lastU;
     uint32_T tmp_1;
     uint32_T tmp_2;
-    static const int64m_T tmp_5 = { { MAX_uint32_T, 2147483647UL }/* chunks */
+    static const int64m_T tmp_4 = { { MAX_uint32_T, 2147483647UL }/* chunks */
     };
 
-    static const int64m_T tmp_6 = { { 0UL, 0UL }/* chunks */
+    static const int64m_T tmp_5 = { { 0UL, 0UL }/* chunks */
     };
 
-    static const int64m_T tmp_7 = { { 0UL, 2147483648UL }/* chunks */
+    static const int64m_T tmp_6 = { { 0UL, 2147483648UL }/* chunks */
     };
 
-    /* Update for UnitDelay: '<S3>/UD' incorporates:
-     *  SampleTimeMath: '<S3>/TSamp'
-     *
-     * About '<S3>/TSamp':
-     *  y = u * K where K = 1 / ( w * Ts )
-     *  Multiplication by K = weightedTsampQuantized is being
-     *  done implicitly by changing the scaling of the input signal.
-     *  No work needs to be done here.  Downstream blocks may need
-     *  to do work to handle the scaling of the output; this happens
-     *  automatically.
-     *
-     * Block description for '<S3>/UD':
-     *
-     *  Store in Global RAM
-     */
-    motor_ctrl_with_PID_DW.UD_DSTATE = rtb_TSamp;
-
-    /* Update for DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
-    sLong2MultiWord(motor_ctrl_with_PID_B.DataTypeConversion1, &tmp_0.chunks[0U],
-                    2);
-    sMultiWordShl(&tmp_0.chunks[0U], 2, 30U, &denAccum.chunks[0U], 2);
-    tmp_1 = (uint32_T)motor_ctrl_with_PID_P.den_Gd[1L];
-    tmp_2 = (uint32_T)motor_ctrl_with_PID_DW.DiscreteTransferFcn_states;
-    sMultiWordMul(&tmp_1, 1, &tmp_2, 1, &tmp_0.chunks[0U], 2);
-    MultiWordSub(&denAccum.chunks[0U], &tmp_0.chunks[0U], &denAccum_0.chunks[0U],
-                 2);
-    if (motor_ctrl_with_PID_P.den_Gd[0] == 0L) {
-      if (sMultiWordGe(&denAccum_0.chunks[0U], &tmp_6.chunks[0U], 2)) {
-        tmp = tmp_5;
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+      /* Update for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+      sLong2MultiWord(motor_ctrl_with_PID_B.DataTypeConversion1_m,
+                      &tmp_0.chunks[0U], 2);
+      sMultiWordShl(&tmp_0.chunks[0U], 2, 30U, &denAccum.chunks[0U], 2);
+      tmp_1 = (uint32_T)motor_ctrl_with_PID_P.den_Gd[1L];
+      tmp_2 = (uint32_T)motor_ctrl_with_PID_DW.DiscreteTransferFcn_states;
+      sMultiWordMul(&tmp_1, 1, &tmp_2, 1, &tmp_0.chunks[0U], 2);
+      MultiWordSub(&denAccum.chunks[0U], &tmp_0.chunks[0U], &denAccum_0.chunks
+                   [0U], 2);
+      if (motor_ctrl_with_PID_P.den_Gd[0] == 0L) {
+        if (sMultiWordGe(&denAccum_0.chunks[0U], &tmp_5.chunks[0U], 2)) {
+          tmp = tmp_4;
+        } else {
+          tmp = tmp_6;
+        }
       } else {
-        tmp = tmp_7;
+        sMultiWord2MultiWord(&denAccum_0.chunks[0U], 2,
+                             &motor_ctrl_with_PID_B.r4.chunks[0U], 3);
+        sMultiWordShl(&motor_ctrl_with_PID_B.r4.chunks[0U], 3, 30U,
+                      &motor_ctrl_with_PID_B.r3.chunks[0U], 3);
+        sLong2MultiWord(motor_ctrl_with_PID_P.den_Gd[0],
+                        &motor_ctrl_with_PID_B.r4.chunks[0U], 3);
+        sMultiWordDivFloor(&motor_ctrl_with_PID_B.r3.chunks[0U], 3,
+                           &motor_ctrl_with_PID_B.r4.chunks[0U], 3,
+                           &motor_ctrl_with_PID_B.r.chunks[0U], 4,
+                           &motor_ctrl_with_PID_B.r5.chunks[0U], 3,
+                           &motor_ctrl_with_PID_B.r6.chunks[0U], 3,
+                           &motor_ctrl_with_PID_B.r7.chunks[0U], 3);
+        sMultiWord2MultiWord(&motor_ctrl_with_PID_B.r.chunks[0U], 4,
+                             &tmp.chunks[0U], 2);
       }
+
+      sMultiWordShr(&tmp.chunks[0U], 2, 30U, &tmp_3.chunks[0U], 2);
+      motor_ctrl_with_PID_DW.DiscreteTransferFcn_states = MultiWord2sLong
+        (&tmp_3.chunks[0U]);
+
+      /* End of Update for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+    }
+
+    /* Update for Derivative: '<S3>/Derivative2' */
+    if (motor_ctrl_with_PID_DW.TimeStampA == (rtInf)) {
+      motor_ctrl_with_PID_DW.TimeStampA = motor_ctrl_with_PID_M->Timing.t[0];
+      lastU = &motor_ctrl_with_PID_DW.LastUAtTimeA;
+    } else if (motor_ctrl_with_PID_DW.TimeStampB == (rtInf)) {
+      motor_ctrl_with_PID_DW.TimeStampB = motor_ctrl_with_PID_M->Timing.t[0];
+      lastU = &motor_ctrl_with_PID_DW.LastUAtTimeB;
+    } else if (motor_ctrl_with_PID_DW.TimeStampA <
+               motor_ctrl_with_PID_DW.TimeStampB) {
+      motor_ctrl_with_PID_DW.TimeStampA = motor_ctrl_with_PID_M->Timing.t[0];
+      lastU = &motor_ctrl_with_PID_DW.LastUAtTimeA;
     } else {
-      sMultiWord2MultiWord(&denAccum_0.chunks[0U], 2,
-                           &motor_ctrl_with_PID_B.r2.chunks[0U], 3);
-      sMultiWordShl(&motor_ctrl_with_PID_B.r2.chunks[0U], 3, 30U,
-                    &motor_ctrl_with_PID_B.r1.chunks[0U], 3);
-      sLong2MultiWord(motor_ctrl_with_PID_P.den_Gd[0],
-                      &motor_ctrl_with_PID_B.r2.chunks[0U], 3);
-      sMultiWordDivFloor(&motor_ctrl_with_PID_B.r1.chunks[0U], 3,
-                         &motor_ctrl_with_PID_B.r2.chunks[0U], 3,
-                         &motor_ctrl_with_PID_B.r.chunks[0U], 4,
-                         &motor_ctrl_with_PID_B.r3.chunks[0U], 3,
-                         &motor_ctrl_with_PID_B.r4.chunks[0U], 3, &tmp_3.chunks
-                         [0U], 3);
-      sMultiWord2MultiWord(&motor_ctrl_with_PID_B.r.chunks[0U], 4, &tmp.chunks
-                           [0U], 2);
+      motor_ctrl_with_PID_DW.TimeStampB = motor_ctrl_with_PID_M->Timing.t[0];
+      lastU = &motor_ctrl_with_PID_DW.LastUAtTimeB;
     }
 
-    sMultiWordShr(&tmp.chunks[0U], 2, 30U, &tmp_4.chunks[0U], 2);
-    motor_ctrl_with_PID_DW.DiscreteTransferFcn_states = MultiWord2sLong
-      (&tmp_4.chunks[0U]);
+    *lastU = motor_ctrl_with_PID_B.Gain3;
 
-    /* End of Update for DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
-  }
-
-  {                                    /* Sample time: [0.0s, 0.0s] */
-    extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
-    extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T)
-      ((motor_ctrl_with_PID_M->Timing.clockTick0 * 1) + 0)
-      ;
-
-    /* Trigger External Mode event */
-    errorCode = extmodeEvent(0,currentTime);
-    if (errorCode != EXTMODE_SUCCESS) {
-      /* Code to handle External Mode event errors
-         may be added here */
+    /* End of Update for Derivative: '<S3>/Derivative2' */
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+      /* Update for UnitDelay: '<S4>/UD' incorporates:
+       *  SampleTimeMath: '<S4>/TSamp'
+       *
+       * About '<S4>/TSamp':
+       *  y = u * K where K = 1 / ( w * Ts )
+       *  Multiplication by K = weightedTsampQuantized is being
+       *  done implicitly by changing the scaling of the input signal.
+       *  No work needs to be done here.  Downstream blocks may need
+       *  to do work to handle the scaling of the output; this happens
+       *  automatically.
+       *
+       * Block description for '<S4>/UD':
+       *
+       *  Store in Global RAM
+       */
+      motor_ctrl_with_PID_DW.UD_DSTATE = rtb_TSamp;
     }
-  }
 
-  {                                    /* Sample time: [0.01s, 0.0s] */
-    extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
-    extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T)
-      ((motor_ctrl_with_PID_M->Timing.clockTick1 * 1) + 0)
-      ;
+    {                                  /* Sample time: [0.0s, 0.0s] */
+      extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
+      extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T)
+        ((motor_ctrl_with_PID_M->Timing.clockTick0 * 1) + 0)
+        ;
 
-    /* Trigger External Mode event */
-    errorCode = extmodeEvent(1,currentTime);
-    if (errorCode != EXTMODE_SUCCESS) {
-      /* Code to handle External Mode event errors
-         may be added here */
+      /* Trigger External Mode event */
+      errorCode = extmodeEvent(0,currentTime);
+      if (errorCode != EXTMODE_SUCCESS) {
+        /* Code to handle External Mode event errors
+           may be added here */
+      }
     }
-  }
 
-  /* Update absolute time for base rate */
-  /* The "clockTick0" counts the number of times the code of this task has
-   * been executed. The absolute time is the multiplication of "clockTick0"
-   * and "Timing.stepSize0". Size of "clockTick0" ensures timer will not
-   * overflow during the application lifespan selected.
-   */
-  motor_ctrl_with_PID_M->Timing.t[0] =
-    ((time_T)(++motor_ctrl_with_PID_M->Timing.clockTick0)) *
-    motor_ctrl_with_PID_M->Timing.stepSize0;
+    if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {/* Sample time: [0.01s, 0.0s] */
+      extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
+      extmodeSimulationTime_T currentTime = (extmodeSimulationTime_T)
+        ((motor_ctrl_with_PID_M->Timing.clockTick1 * 1) + 0)
+        ;
 
-  {
-    /* Update absolute timer for sample time: [0.01s, 0.0s] */
-    /* The "clockTick1" counts the number of times the code of this task has
-     * been executed. The resolution of this integer timer is 0.01, which is the step size
-     * of the task. Size of "clockTick1" ensures timer will not overflow during the
-     * application lifespan selected.
+      /* Trigger External Mode event */
+      errorCode = extmodeEvent(1,currentTime);
+      if (errorCode != EXTMODE_SUCCESS) {
+        /* Code to handle External Mode event errors
+           may be added here */
+      }
+    }
+  }                                    /* end MajorTimeStep */
+
+  if (rtmIsMajorTimeStep(motor_ctrl_with_PID_M)) {
+    rt_ertODEUpdateContinuousStates(&motor_ctrl_with_PID_M->solverInfo);
+
+    /* Update absolute time for base rate */
+    /* The "clockTick0" counts the number of times the code of this task has
+     * been executed. The absolute time is the multiplication of "clockTick0"
+     * and "Timing.stepSize0". Size of "clockTick0" ensures timer will not
+     * overflow during the application lifespan selected.
      */
-    motor_ctrl_with_PID_M->Timing.clockTick1++;
-  }
+    ++motor_ctrl_with_PID_M->Timing.clockTick0;
+    motor_ctrl_with_PID_M->Timing.t[0] = rtsiGetSolverStopTime
+      (&motor_ctrl_with_PID_M->solverInfo);
+
+    {
+      /* Update absolute timer for sample time: [0.01s, 0.0s] */
+      /* The "clockTick1" counts the number of times the code of this task has
+       * been executed. The resolution of this integer timer is 0.01, which is the step size
+       * of the task. Size of "clockTick1" ensures timer will not overflow during the
+       * application lifespan selected.
+       */
+      motor_ctrl_with_PID_M->Timing.clockTick1++;
+    }
+  }                                    /* end MajorTimeStep */
+}
+
+/* Derivatives for root system: '<Root>' */
+void motor_ctrl_with_PID_derivatives(void)
+{
+  XDot_motor_ctrl_with_PID_T *_rtXdot;
+  _rtXdot = ((XDot_motor_ctrl_with_PID_T *) motor_ctrl_with_PID_M->derivs);
+
+  /* Derivatives for Integrator: '<S3>/Integrator2' */
+  _rtXdot->Integrator2_CSTATE = motor_ctrl_with_PID_B.Gain1_e;
 }
 
 /* Model initialize function */
@@ -938,32 +1258,60 @@ void motor_ctrl_with_PID_initialize(void)
                 (motor_ctrl_with_PID_M));
     rtsiSetStepSizePtr(&motor_ctrl_with_PID_M->solverInfo,
                        &motor_ctrl_with_PID_M->Timing.stepSize0);
+    rtsiSetdXPtr(&motor_ctrl_with_PID_M->solverInfo,
+                 &motor_ctrl_with_PID_M->derivs);
+    rtsiSetContStatesPtr(&motor_ctrl_with_PID_M->solverInfo, (real_T **)
+                         &motor_ctrl_with_PID_M->contStates);
+    rtsiSetNumContStatesPtr(&motor_ctrl_with_PID_M->solverInfo,
+      &motor_ctrl_with_PID_M->Sizes.numContStates);
+    rtsiSetNumPeriodicContStatesPtr(&motor_ctrl_with_PID_M->solverInfo,
+      &motor_ctrl_with_PID_M->Sizes.numPeriodicContStates);
+    rtsiSetPeriodicContStateIndicesPtr(&motor_ctrl_with_PID_M->solverInfo,
+      &motor_ctrl_with_PID_M->periodicContStateIndices);
+    rtsiSetPeriodicContStateRangesPtr(&motor_ctrl_with_PID_M->solverInfo,
+      &motor_ctrl_with_PID_M->periodicContStateRanges);
+    rtsiSetContStateDisabledPtr(&motor_ctrl_with_PID_M->solverInfo, (boolean_T**)
+      &motor_ctrl_with_PID_M->contStateDisabled);
     rtsiSetErrorStatusPtr(&motor_ctrl_with_PID_M->solverInfo,
                           (&rtmGetErrorStatus(motor_ctrl_with_PID_M)));
     rtsiSetRTModelPtr(&motor_ctrl_with_PID_M->solverInfo, motor_ctrl_with_PID_M);
   }
 
   rtsiSetSimTimeStep(&motor_ctrl_with_PID_M->solverInfo, MAJOR_TIME_STEP);
-  rtsiSetSolverName(&motor_ctrl_with_PID_M->solverInfo,"FixedStepDiscrete");
+  motor_ctrl_with_PID_M->intgData.y = motor_ctrl_with_PID_M->odeY;
+  motor_ctrl_with_PID_M->intgData.f[0] = motor_ctrl_with_PID_M->odeF[0];
+  motor_ctrl_with_PID_M->intgData.f[1] = motor_ctrl_with_PID_M->odeF[1];
+  motor_ctrl_with_PID_M->intgData.f[2] = motor_ctrl_with_PID_M->odeF[2];
+  motor_ctrl_with_PID_M->contStates = ((X_motor_ctrl_with_PID_T *)
+    &motor_ctrl_with_PID_X);
+  motor_ctrl_with_PID_M->contStateDisabled = ((XDis_motor_ctrl_with_PID_T *)
+    &motor_ctrl_with_PID_XDis);
+  motor_ctrl_with_PID_M->Timing.tStart = (0.0);
+  rtsiSetSolverData(&motor_ctrl_with_PID_M->solverInfo, (void *)
+                    &motor_ctrl_with_PID_M->intgData);
+  rtsiSetIsMinorTimeStepWithModeChange(&motor_ctrl_with_PID_M->solverInfo, false);
+  rtsiSetSolverName(&motor_ctrl_with_PID_M->solverInfo,"ode3");
   rtmSetTPtr(motor_ctrl_with_PID_M, &motor_ctrl_with_PID_M->Timing.tArray[0]);
   rtmSetTFinal(motor_ctrl_with_PID_M, -1);
   motor_ctrl_with_PID_M->Timing.stepSize0 = 0.01;
 
   /* External mode info */
-  motor_ctrl_with_PID_M->Sizes.checksums[0] = (3542897183U);
-  motor_ctrl_with_PID_M->Sizes.checksums[1] = (1685557345U);
-  motor_ctrl_with_PID_M->Sizes.checksums[2] = (1412882960U);
-  motor_ctrl_with_PID_M->Sizes.checksums[3] = (482913223U);
+  motor_ctrl_with_PID_M->Sizes.checksums[0] = (3570471243U);
+  motor_ctrl_with_PID_M->Sizes.checksums[1] = (2069951476U);
+  motor_ctrl_with_PID_M->Sizes.checksums[2] = (1533817108U);
+  motor_ctrl_with_PID_M->Sizes.checksums[3] = (3252301250U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
     static RTWExtModeInfo rt_ExtModeInfo;
-    static const sysRanDType *systemRan[3];
+    static const sysRanDType *systemRan[5];
     motor_ctrl_with_PID_M->extModeInfo = (&rt_ExtModeInfo);
     rteiSetSubSystemActiveVectorAddresses(&rt_ExtModeInfo, systemRan);
     systemRan[0] = &rtAlwaysEnabled;
     systemRan[1] = &rtAlwaysEnabled;
     systemRan[2] = &rtAlwaysEnabled;
+    systemRan[3] = &rtAlwaysEnabled;
+    systemRan[4] = &rtAlwaysEnabled;
     rteiSetModelMappingInfoPtr(motor_ctrl_with_PID_M->extModeInfo,
       &motor_ctrl_with_PID_M->SpecialInfo.mappingInfo);
     rteiSetChecksumsPtr(motor_ctrl_with_PID_M->extModeInfo,
@@ -972,27 +1320,44 @@ void motor_ctrl_with_PID_initialize(void)
                 (motor_ctrl_with_PID_M));
   }
 
-  /* InitializeConditions for UnitDelay: '<S3>/UD'
+  /* InitializeConditions for Integrator: '<S3>/Integrator2' */
+  motor_ctrl_with_PID_X.Integrator2_CSTATE =
+    motor_ctrl_with_PID_P.Integrator2_IC;
+
+  /* InitializeConditions for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+  motor_ctrl_with_PID_DW.DiscreteTransferFcn_states =
+    motor_ctrl_with_PID_P.DiscreteTransferFcn_InitialStat;
+
+  /* InitializeConditions for Derivative: '<S3>/Derivative2' */
+  motor_ctrl_with_PID_DW.TimeStampA = (rtInf);
+  motor_ctrl_with_PID_DW.TimeStampB = (rtInf);
+
+  /* InitializeConditions for UnitDelay: '<S4>/UD'
    *
-   * Block description for '<S3>/UD':
+   * Block description for '<S4>/UD':
    *
    *  Store in Global RAM
    */
   motor_ctrl_with_PID_DW.UD_DSTATE =
     motor_ctrl_with_PID_P.DiscreteDerivative_ICPrevScaled;
 
-  /* InitializeConditions for DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
-  motor_ctrl_with_PID_DW.DiscreteTransferFcn_states =
-    motor_ctrl_with_PID_P.DiscreteTransferFcn_InitialStat;
+  /* Start for MATLABSystem: '<Root>/Analog Input' */
+  motor_ctrl_with_PID_DW.obj_j.matlabCodegenIsDeleted = false;
+  motor_ctrl_with_PID_DW.obj_j.SampleTime =
+    motor_ctrl_with_PID_P.AnalogInput_SampleTime;
+  motor_ctrl_with_PID_DW.obj_j.isInitialized = 1L;
+  motor_ctrl_with_PID_DW.obj_j.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
+    MW_AnalogInSingle_Open(62UL);
+  motor_ctrl_with_PID_DW.obj_j.isSetupComplete = true;
 
-  /* Start for MATLABSystem: '<S1>/PWM' */
-  motor_ctrl_with_PID_DW.obj_o.matlabCodegenIsDeleted = false;
-  motor_ctrl_with_PID_DW.obj_o.isInitialized = 1L;
-  motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL,
+  /* Start for MATLABSystem: '<S2>/PWM' */
+  motor_ctrl_with_PID_DW.obj_p.matlabCodegenIsDeleted = false;
+  motor_ctrl_with_PID_DW.obj_p.isInitialized = 1L;
+  motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL,
     0.0, 0.0);
-  motor_ctrl_with_PID_DW.obj_o.isSetupComplete = true;
+  motor_ctrl_with_PID_DW.obj_p.isSetupComplete = true;
 
-  /* Start for MATLABSystem: '<S2>/Encoder' */
+  /* Start for MATLABSystem: '<S1>/Encoder' */
   motor_ctrl_with_PID_DW.obj.Index = 0U;
   motor_ctrl_with_PID_DW.obj.matlabCodegenIsDeleted = false;
   motor_ctrl_with_PID_DW.obj.SampleTime =
@@ -1002,30 +1367,49 @@ void motor_ctrl_with_PID_initialize(void)
   motor_ctrl_with_PID_DW.obj.isSetupComplete = true;
   motor_ctrl_with_PID_DW.obj.TunablePropsChanged = false;
 
-  /* InitializeConditions for MATLABSystem: '<S2>/Encoder' */
+  /* InitializeConditions for MATLABSystem: '<S1>/Encoder' */
   MW_EncoderReset(motor_ctrl_with_PID_DW.obj.Index);
+
+  /* Start for MATLABSystem: '<Root>/L_Motor(시계)' */
+  motor_ctrl_with_PID_DW.obj_a.matlabCodegenIsDeleted = false;
+  motor_ctrl_with_PID_DW.obj_a.isInitialized = 1L;
+  digitalIOSetup(13, 1);
+  motor_ctrl_with_PID_DW.obj_a.isSetupComplete = true;
 }
 
 /* Model terminate function */
 void motor_ctrl_with_PID_terminate(void)
 {
-  /* Terminate for MATLABSystem: '<S1>/PWM' */
-  if (!motor_ctrl_with_PID_DW.obj_o.matlabCodegenIsDeleted) {
-    motor_ctrl_with_PID_DW.obj_o.matlabCodegenIsDeleted = true;
-    if ((motor_ctrl_with_PID_DW.obj_o.isInitialized == 1L) &&
-        motor_ctrl_with_PID_DW.obj_o.isSetupComplete) {
-      motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
-        (11UL);
-      MW_PWM_SetDutyCycle
-        (motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE, 0.0);
-      motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
-        (11UL);
-      MW_PWM_Close(motor_ctrl_with_PID_DW.obj_o.PWMDriverObj.MW_PWM_HANDLE);
+  /* Terminate for MATLABSystem: '<Root>/Analog Input' */
+  if (!motor_ctrl_with_PID_DW.obj_j.matlabCodegenIsDeleted) {
+    motor_ctrl_with_PID_DW.obj_j.matlabCodegenIsDeleted = true;
+    if ((motor_ctrl_with_PID_DW.obj_j.isInitialized == 1L) &&
+        motor_ctrl_with_PID_DW.obj_j.isSetupComplete) {
+      motor_ctrl_with_PID_DW.obj_j.AnalogInDriverObj.MW_ANALOGIN_HANDLE =
+        MW_AnalogIn_GetHandle(62UL);
+      MW_AnalogIn_Close
+        (motor_ctrl_with_PID_DW.obj_j.AnalogInDriverObj.MW_ANALOGIN_HANDLE);
     }
   }
 
-  /* End of Terminate for MATLABSystem: '<S1>/PWM' */
-  /* Terminate for MATLABSystem: '<S2>/Encoder' */
+  /* End of Terminate for MATLABSystem: '<Root>/Analog Input' */
+  /* Terminate for MATLABSystem: '<S2>/PWM' */
+  if (!motor_ctrl_with_PID_DW.obj_p.matlabCodegenIsDeleted) {
+    motor_ctrl_with_PID_DW.obj_p.matlabCodegenIsDeleted = true;
+    if ((motor_ctrl_with_PID_DW.obj_p.isInitialized == 1L) &&
+        motor_ctrl_with_PID_DW.obj_p.isSetupComplete) {
+      motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
+        (11UL);
+      MW_PWM_SetDutyCycle
+        (motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE, 0.0);
+      motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
+        (11UL);
+      MW_PWM_Close(motor_ctrl_with_PID_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE);
+    }
+  }
+
+  /* End of Terminate for MATLABSystem: '<S2>/PWM' */
+  /* Terminate for MATLABSystem: '<S1>/Encoder' */
   if (!motor_ctrl_with_PID_DW.obj.matlabCodegenIsDeleted) {
     motor_ctrl_with_PID_DW.obj.matlabCodegenIsDeleted = true;
     if ((motor_ctrl_with_PID_DW.obj.isInitialized == 1L) &&
@@ -1034,7 +1418,13 @@ void motor_ctrl_with_PID_terminate(void)
     }
   }
 
-  /* End of Terminate for MATLABSystem: '<S2>/Encoder' */
+  /* End of Terminate for MATLABSystem: '<S1>/Encoder' */
+  /* Terminate for MATLABSystem: '<Root>/L_Motor(시계)' */
+  if (!motor_ctrl_with_PID_DW.obj_a.matlabCodegenIsDeleted) {
+    motor_ctrl_with_PID_DW.obj_a.matlabCodegenIsDeleted = true;
+  }
+
+  /* End of Terminate for MATLABSystem: '<Root>/L_Motor(시계)' */
 }
 
 /*

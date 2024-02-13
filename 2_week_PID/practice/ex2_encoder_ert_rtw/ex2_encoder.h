@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ex2_encoder'.
  *
- * Model version                  : 1.28
+ * Model version                  : 1.31
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Fri Feb  9 21:52:13 2024
+ * C/C++ source code generated on : Sun Feb 11 15:59:07 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -186,19 +186,15 @@ typedef struct {
   int96m_T r7;
   int64m_T Gain1;                      /* '<S1>/Gain1' */
   int64m_T DiscreteTransferFcn;        /* '<S1>/Discrete Transfer Fcn' */
-  real_T Step1;                        /* '<Root>/Step1' */
-  real_T Divide1;                      /* '<Root>/Divide1' */
-  real_T Add4;                         /* '<Root>/Add4' */
-  real_T Gain3;                        /* '<S3>/Gain3' */
-  real_T Subtract2;                    /* '<S3>/Subtract2' */
-  real_T Saturation1;                  /* '<Root>/Saturation1' */
+  real_T Gain6;                        /* '<S3>/Gain6' */
+  real_T Subtract1;                    /* '<S3>/Subtract1' */
+  real_T Saturation;                   /* '<Root>/Saturation' */
   real_T DataTypeConversion1;          /* '<S2>/Data Type Conversion1' */
   real_T TmpSignalConversionAtTAQSigLogg[2];
-  /* '<Root>/TmpSignal ConversionAtTAQSigLogging_InsertedFor_Mux2_at_outport_0Inport1' */
-  real_T Gain1_e;                      /* '<S3>/Gain1' */
-  int32_T DataTypeConversion1_m;       /* '<S1>/Data Type Conversion1' */
-  uint8_T DataTypeConversion;          /* '<Root>/Data Type Conversion' */
-  uint8_T DataTypeConversion_h;        /* '<S2>/Data Type Conversion' */
+  /* '<Root>/TmpSignal ConversionAtTAQSigLogging_InsertedFor_Mux1_at_outport_0Inport1' */
+  real_T Gain4;                        /* '<S3>/Gain4' */
+  int32_T DataTypeConversion1_e;       /* '<S1>/Data Type Conversion1' */
+  uint8_T DataTypeConversion;          /* '<S2>/Data Type Conversion' */
 } B_ex2_encoder_T;
 
 /* Block states (default storage) for system '<Root>' */
@@ -206,35 +202,35 @@ typedef struct {
   codertarget_arduinobase_int_n_T obj; /* '<S1>/Encoder' */
   codertarget_arduinobase_inter_T obj_j;/* '<Root>/Analog Input' */
   codertarget_arduinobase_in_nq_T obj_p;/* '<S2>/PWM' */
-  real_T TimeStampA;                   /* '<S3>/Derivative2' */
-  real_T LastUAtTimeA;                 /* '<S3>/Derivative2' */
-  real_T TimeStampB;                   /* '<S3>/Derivative2' */
-  real_T LastUAtTimeB;                 /* '<S3>/Derivative2' */
+  real_T TimeStampA;                   /* '<S3>/Derivative1' */
+  real_T LastUAtTimeA;                 /* '<S3>/Derivative1' */
+  real_T TimeStampB;                   /* '<S3>/Derivative1' */
+  real_T LastUAtTimeB;                 /* '<S3>/Derivative1' */
   struct {
     void *LoggedData;
-  } Scope2_PWORK;                      /* '<Root>/Scope2' */
+  } Scope3_PWORK;                      /* '<Root>/Scope3' */
 
   struct {
     void *LoggedData[2];
-  } Scope1_PWORK;                      /* '<Root>/Scope1' */
+  } Scope_PWORK;                       /* '<Root>/Scope' */
 
   int32_T DiscreteTransferFcn_states;  /* '<S1>/Discrete Transfer Fcn' */
-  int32_T UD_DSTATE;                   /* '<S5>/UD' */
+  int32_T UD_DSTATE;                   /* '<S4>/UD' */
 } DW_ex2_encoder_T;
 
 /* Continuous states (default storage) */
 typedef struct {
-  real_T Integrator2_CSTATE;           /* '<S3>/Integrator2' */
+  real_T Integrator1_CSTATE;           /* '<S3>/Integrator1' */
 } X_ex2_encoder_T;
 
 /* State derivatives (default storage) */
 typedef struct {
-  real_T Integrator2_CSTATE;           /* '<S3>/Integrator2' */
+  real_T Integrator1_CSTATE;           /* '<S3>/Integrator1' */
 } XDot_ex2_encoder_T;
 
 /* State disabled  */
 typedef struct {
-  boolean_T Integrator2_CSTATE;        /* '<S3>/Integrator2' */
+  boolean_T Integrator1_CSTATE;        /* '<S3>/Integrator1' */
 } XDis_ex2_encoder_T;
 
 #ifndef ODE3_INTG
@@ -251,19 +247,16 @@ typedef struct {
 /* Parameters (default storage) */
 struct P_ex2_encoder_T_ {
   real_T KD;                           /* Variable: KD
-                                        * Referenced by: '<S3>/Gain3'
+                                        * Referenced by: '<S3>/Gain6'
                                         */
   real_T KI;                           /* Variable: KI
-                                        * Referenced by: '<S3>/Gain1'
+                                        * Referenced by: '<S3>/Gain4'
                                         */
   real_T KP;                           /* Variable: KP
-                                        * Referenced by: '<S3>/Gain2'
+                                        * Referenced by: '<S3>/Gain5'
                                         */
   real_T Vlim;                         /* Variable: Vlim
                                         * Referenced by: '<S2>/Gain1'
-                                        */
-  real_T Wref;                         /* Variable: Wref
-                                        * Referenced by: '<Root>/Step1'
                                         */
   int32_T den_Gd[2];                   /* Variable: den_Gd
                                         * Referenced by: '<S1>/Discrete Transfer Fcn'
@@ -276,7 +269,7 @@ struct P_ex2_encoder_T_ {
                                         */
   int32_T DiscreteDerivative_ICPrevScaled;
                               /* Mask Parameter: DiscreteDerivative_ICPrevScaled
-                               * Referenced by: '<S5>/UD'
+                               * Referenced by: '<S4>/UD'
                                */
   real_T AnalogInput_SampleTime;       /* Expression: -1
                                         * Referenced by: '<Root>/Analog Input'
@@ -284,29 +277,14 @@ struct P_ex2_encoder_T_ {
   real_T Encoder_SampleTime;           /* Expression: -1
                                         * Referenced by: '<S1>/Encoder'
                                         */
-  real_T Step1_Time;                   /* Expression: 1
-                                        * Referenced by: '<Root>/Step1'
+  real_T Integrator1_IC;               /* Expression: 0
+                                        * Referenced by: '<S3>/Integrator1'
                                         */
-  real_T Step1_Y0;                     /* Expression: 0
-                                        * Referenced by: '<Root>/Step1'
+  real_T Saturation_UpperSat;          /* Expression: 12
+                                        * Referenced by: '<Root>/Saturation'
                                         */
-  real_T Integrator2_IC;               /* Expression: 0
-                                        * Referenced by: '<S3>/Integrator2'
-                                        */
-  real_T Constant_Value;               /* Expression: 128
-                                        * Referenced by: '<Root>/Constant'
-                                        */
-  real_T Constant1_Value;              /* Expression: 6.4
-                                        * Referenced by: '<Root>/Constant1'
-                                        */
-  real_T Constant2_Value;              /* Expression: 100
-                                        * Referenced by: '<Root>/Constant2'
-                                        */
-  real_T Saturation1_UpperSat;         /* Expression: 12
-                                        * Referenced by: '<Root>/Saturation1'
-                                        */
-  real_T Saturation1_LowerSat;         /* Expression: 0
-                                        * Referenced by: '<Root>/Saturation1'
+  real_T Saturation_LowerSat;          /* Expression: 0
+                                        * Referenced by: '<Root>/Saturation'
                                         */
   int64m_T Gain2_Gain;                 /* Computed Parameter: Gain2_Gain
                                         * Referenced by: '<S1>/Gain2'
@@ -405,7 +383,7 @@ extern volatile boolean_T runModel;
 /*-
  * These blocks were eliminated from the model due to optimizations:
  *
- * Block '<S5>/Data Type Duplicate' : Unused code path elimination
+ * Block '<S4>/Data Type Duplicate' : Unused code path elimination
  */
 
 /*-
@@ -423,11 +401,10 @@ extern volatile boolean_T runModel;
  * Here is the system hierarchy for this model
  *
  * '<Root>' : 'ex2_encoder'
- * '<S1>'   : 'ex2_encoder/Subsystem3'
- * '<S2>'   : 'ex2_encoder/Subsystem4'
- * '<S3>'   : 'ex2_encoder/Subsystem5'
- * '<S4>'   : 'ex2_encoder/Subsystem6'
- * '<S5>'   : 'ex2_encoder/Subsystem3/Discrete Derivative'
+ * '<S1>'   : 'ex2_encoder/Subsystem'
+ * '<S2>'   : 'ex2_encoder/Subsystem1'
+ * '<S3>'   : 'ex2_encoder/Subsystem6'
+ * '<S4>'   : 'ex2_encoder/Subsystem/Discrete Derivative'
  */
 #endif                                 /* RTW_HEADER_ex2_encoder_h_ */
 

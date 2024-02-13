@@ -9,7 +9,7 @@
  *
  * Model version                  : 1.37
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Fri Feb  9 10:04:18 2024
+ * C/C++ source code generated on : Sat Feb 10 22:59:09 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -825,10 +825,10 @@ void DCmotor_Speed_Ctrl_step(void)
 
     /* End of Step: '<Root>/Wref1' */
     if (rtmIsMajorTimeStep(DCmotor_Speed_Ctrl_M)) {
-      /* DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+      /* DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
       DCmotor_Speed_Ctrl_B.Wrads = tmp_3;
 
-      /* DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+      /* DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
       tmp = (uint32_T)DCmotor_Speed_Ctrl_P.num_Gd[1L];
       tmp_0 = (uint32_T)DCmotor_Speed_Ctrl_DW.DiscreteTransferFcn_states;
       sMultiWordMul(&tmp, 1, &tmp_0, 1, &DCmotor_Speed_Ctrl_B.Wrads.chunks[0U],
@@ -836,12 +836,12 @@ void DCmotor_Speed_Ctrl_step(void)
     }
 
     /* Sum: '<Root>/Add3' incorporates:
-     *  DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn'
+     *  DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn'
      */
     DCmotor_Speed_Ctrl_B.Add3 = DCmotor_Speed_Ctrl_B.Wref - sMultiWord2Double
       (&DCmotor_Speed_Ctrl_B.Wrads.chunks[0U], 2, 0) * 1.1641532182693481E-10;
 
-    /* MATLABSystem: '<Root>/PWM' */
+    /* MATLABSystem: '<S1>/PWM' */
     DCmotor_Speed_Ctrl_DW.obj_m.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle
       (11UL);
 
@@ -853,16 +853,16 @@ void DCmotor_Speed_Ctrl_step(void)
       DCmotor_Speed_Ctrl_X.TransferFcn1_CSTATE + DCmotor_Speed_Ctrl_P.Kp *
       DCmotor_Speed_Ctrl_B.Add3;
 
-    /* Saturate: '<Root>/Saturation1' */
+    /* Saturate: '<S1>/Saturation1' */
     if (u0 > DCmotor_Speed_Ctrl_P.Vlim) {
       u0 = DCmotor_Speed_Ctrl_P.Vlim;
     } else if (u0 < DCmotor_Speed_Ctrl_P.Saturation1_LowerSat) {
       u0 = DCmotor_Speed_Ctrl_P.Saturation1_LowerSat;
     }
 
-    /* DataTypeConversion: '<Root>/Data Type Conversion' incorporates:
-     *  Gain: '<Root>/Gain'
-     *  Saturate: '<Root>/Saturation1'
+    /* DataTypeConversion: '<S1>/Data Type Conversion' incorporates:
+     *  Gain: '<S1>/Gain'
+     *  Saturate: '<S1>/Saturation1'
      */
     u0 = floor(255.0 / DCmotor_Speed_Ctrl_P.Vlim * u0);
     if (rtIsNaN(u0) || rtIsInf(u0)) {
@@ -871,14 +871,14 @@ void DCmotor_Speed_Ctrl_step(void)
       u0 = fmod(u0, 256.0);
     }
 
-    /* MATLABSystem: '<Root>/PWM' incorporates:
-     *  DataTypeConversion: '<Root>/Data Type Conversion'
+    /* MATLABSystem: '<S1>/PWM' incorporates:
+     *  DataTypeConversion: '<S1>/Data Type Conversion'
      */
     MW_PWM_SetDutyCycle(DCmotor_Speed_Ctrl_DW.obj_m.PWMDriverObj.MW_PWM_HANDLE,
                         (real_T)(u0 < 0.0 ? (int16_T)(uint8_T)-(int8_T)(uint8_T)
       -u0 : (int16_T)(uint8_T)u0));
     if (rtmIsMajorTimeStep(DCmotor_Speed_Ctrl_M)) {
-      /* MATLABSystem: '<S1>/Encoder1' */
+      /* MATLABSystem: '<S2>/Encoder1' */
       if (DCmotor_Speed_Ctrl_DW.obj.SampleTime != DCmotor_Speed_Ctrl_P.Ts) {
         DCmotor_Speed_Ctrl_DW.obj.SampleTime = DCmotor_Speed_Ctrl_P.Ts;
       }
@@ -887,10 +887,10 @@ void DCmotor_Speed_Ctrl_step(void)
         DCmotor_Speed_Ctrl_DW.obj.TunablePropsChanged = false;
       }
 
-      /* SampleTimeMath: '<S2>/TSamp' incorporates:
-       *  MATLABSystem: '<S1>/Encoder1'
+      /* SampleTimeMath: '<S3>/TSamp' incorporates:
+       *  MATLABSystem: '<S2>/Encoder1'
        * *
-       * About '<S2>/TSamp':
+       * About '<S3>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -900,12 +900,12 @@ void DCmotor_Speed_Ctrl_step(void)
        */
       MW_EncoderRead(DCmotor_Speed_Ctrl_DW.obj.Index, &rtb_TSamp);
 
-      /* Gain: '<S1>/mtr_rad//s' incorporates:
-       *  SampleTimeMath: '<S2>/TSamp'
-       *  Sum: '<S2>/Diff'
-       *  UnitDelay: '<S2>/UD'
+      /* Gain: '<S2>/mtr_rad//s' incorporates:
+       *  SampleTimeMath: '<S3>/TSamp'
+       *  Sum: '<S3>/Diff'
+       *  UnitDelay: '<S3>/UD'
        *
-       * About '<S2>/TSamp':
+       * About '<S3>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -913,11 +913,11 @@ void DCmotor_Speed_Ctrl_step(void)
        *  to do work to handle the scaling of the output; this happens
        *  automatically.
        *
-       * Block description for '<S2>/Diff':
+       * Block description for '<S3>/Diff':
        *
        *  Add in CPU
        *
-       * Block description for '<S2>/UD':
+       * Block description for '<S3>/UD':
        *
        *  Store in Global RAM
        */
@@ -926,22 +926,23 @@ void DCmotor_Speed_Ctrl_step(void)
       sMultiWordMul(&tmp, 1, &tmp_0, 1, &DCmotor_Speed_Ctrl_B.mtr_rads.chunks[0U],
                     2);
 
-      /* Gain: '<S1>/RPM' incorporates:
-       *  Gain: '<S1>/mtr_rad//s'
+      /* Gain: '<S2>/RPM' incorporates:
+       *  Gain: '<S2>/mtr_rad//s'
        */
       sMultiWordMul(&DCmotor_Speed_Ctrl_P.RPM_Gain.chunks[0U], 2,
                     &DCmotor_Speed_Ctrl_B.mtr_rads.chunks[0U], 2,
                     &DCmotor_Speed_Ctrl_B.RPM.chunks[0U], 4);
 
-      /* DataTypeConversion: '<S1>/Data Type Conversion1' incorporates:
-       *  Gain: '<S1>/mtr_rad//s'
+      /* DataTypeConversion: '<S2>/Data Type Conversion1' incorporates:
+       *  Gain: '<S2>/mtr_rad//s'
        */
       sMultiWordMul(&DCmotor_Speed_Ctrl_B.mtr_rads.chunks[0U], 2, &tmp_4.chunks
                     [0U], 2, &tmp_2.chunks[0U], 4);
       sMultiWordShr(&tmp_2.chunks[0U], 4, 31U, &tmp_1.chunks[0U], 4);
 
-      /* DataTypeConversion: '<S1>/Data Type Conversion1' */
-      DCmotor_Speed_Ctrl_B.Wrads_c = MultiWord2sLong(&tmp_1.chunks[0U]);
+      /* DataTypeConversion: '<S2>/Data Type Conversion1' */
+      DCmotor_Speed_Ctrl_B.DataTypeConversion1 = MultiWord2sLong(&tmp_1.chunks
+        [0U]);
     }
   }
 
@@ -964,8 +965,9 @@ void DCmotor_Speed_Ctrl_step(void)
     };
 
     if (rtmIsMajorTimeStep(DCmotor_Speed_Ctrl_M)) {
-      /* Update for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
-      sLong2MultiWord(DCmotor_Speed_Ctrl_B.Wrads_c, &tmp_0.chunks[0U], 2);
+      /* Update for DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
+      sLong2MultiWord(DCmotor_Speed_Ctrl_B.DataTypeConversion1, &tmp_0.chunks[0U],
+                      2);
       sMultiWordShl(&tmp_0.chunks[0U], 2, 30U, &denAccum.chunks[0U], 2);
       tmp_1 = (uint32_T)DCmotor_Speed_Ctrl_P.den_Gd[1L];
       tmp_2 = (uint32_T)DCmotor_Speed_Ctrl_DW.DiscreteTransferFcn_states;
@@ -999,12 +1001,12 @@ void DCmotor_Speed_Ctrl_step(void)
       DCmotor_Speed_Ctrl_DW.DiscreteTransferFcn_states = MultiWord2sLong
         (&tmp_4.chunks[0U]);
 
-      /* End of Update for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+      /* End of Update for DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
 
-      /* Update for UnitDelay: '<S2>/UD' incorporates:
-       *  SampleTimeMath: '<S2>/TSamp'
+      /* Update for UnitDelay: '<S3>/UD' incorporates:
+       *  SampleTimeMath: '<S3>/TSamp'
        *
-       * About '<S2>/TSamp':
+       * About '<S3>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -1012,7 +1014,7 @@ void DCmotor_Speed_Ctrl_step(void)
        *  to do work to handle the scaling of the output; this happens
        *  automatically.
        *
-       * Block description for '<S2>/UD':
+       * Block description for '<S3>/UD':
        *
        *  Store in Global RAM
        */
@@ -1139,10 +1141,10 @@ void DCmotor_Speed_Ctrl_initialize(void)
   DCmotor_Speed_Ctrl_M->Timing.stepSize0 = 0.01;
 
   /* External mode info */
-  DCmotor_Speed_Ctrl_M->Sizes.checksums[0] = (1901747315U);
-  DCmotor_Speed_Ctrl_M->Sizes.checksums[1] = (3863895620U);
-  DCmotor_Speed_Ctrl_M->Sizes.checksums[2] = (209891274U);
-  DCmotor_Speed_Ctrl_M->Sizes.checksums[3] = (3947243858U);
+  DCmotor_Speed_Ctrl_M->Sizes.checksums[0] = (3669627768U);
+  DCmotor_Speed_Ctrl_M->Sizes.checksums[1] = (2760325395U);
+  DCmotor_Speed_Ctrl_M->Sizes.checksums[2] = (1150269548U);
+  DCmotor_Speed_Ctrl_M->Sizes.checksums[3] = (1861193591U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
@@ -1164,27 +1166,27 @@ void DCmotor_Speed_Ctrl_initialize(void)
   /* InitializeConditions for TransferFcn: '<Root>/Transfer Fcn1' */
   DCmotor_Speed_Ctrl_X.TransferFcn1_CSTATE = 0.0;
 
-  /* InitializeConditions for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
+  /* InitializeConditions for DiscreteTransferFcn: '<S2>/Discrete Transfer Fcn' */
   DCmotor_Speed_Ctrl_DW.DiscreteTransferFcn_states =
     DCmotor_Speed_Ctrl_P.DiscreteTransferFcn_InitialStat;
 
-  /* InitializeConditions for UnitDelay: '<S2>/UD'
+  /* InitializeConditions for UnitDelay: '<S3>/UD'
    *
-   * Block description for '<S2>/UD':
+   * Block description for '<S3>/UD':
    *
    *  Store in Global RAM
    */
   DCmotor_Speed_Ctrl_DW.UD_DSTATE =
     DCmotor_Speed_Ctrl_P.DiscreteDerivative_ICPrevScaled;
 
-  /* Start for MATLABSystem: '<Root>/PWM' */
+  /* Start for MATLABSystem: '<S1>/PWM' */
   DCmotor_Speed_Ctrl_DW.obj_m.matlabCodegenIsDeleted = false;
   DCmotor_Speed_Ctrl_DW.obj_m.isInitialized = 1L;
   DCmotor_Speed_Ctrl_DW.obj_m.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_Open(11UL, 0.0,
     0.0);
   DCmotor_Speed_Ctrl_DW.obj_m.isSetupComplete = true;
 
-  /* Start for MATLABSystem: '<S1>/Encoder1' */
+  /* Start for MATLABSystem: '<S2>/Encoder1' */
   DCmotor_Speed_Ctrl_DW.obj.Index = 0U;
   DCmotor_Speed_Ctrl_DW.obj.matlabCodegenIsDeleted = false;
   DCmotor_Speed_Ctrl_DW.obj.SampleTime = DCmotor_Speed_Ctrl_P.Ts;
@@ -1193,14 +1195,14 @@ void DCmotor_Speed_Ctrl_initialize(void)
   DCmotor_Speed_Ctrl_DW.obj.isSetupComplete = true;
   DCmotor_Speed_Ctrl_DW.obj.TunablePropsChanged = false;
 
-  /* InitializeConditions for MATLABSystem: '<S1>/Encoder1' */
+  /* InitializeConditions for MATLABSystem: '<S2>/Encoder1' */
   MW_EncoderReset(DCmotor_Speed_Ctrl_DW.obj.Index);
 }
 
 /* Model terminate function */
 void DCmotor_Speed_Ctrl_terminate(void)
 {
-  /* Terminate for MATLABSystem: '<Root>/PWM' */
+  /* Terminate for MATLABSystem: '<S1>/PWM' */
   if (!DCmotor_Speed_Ctrl_DW.obj_m.matlabCodegenIsDeleted) {
     DCmotor_Speed_Ctrl_DW.obj_m.matlabCodegenIsDeleted = true;
     if ((DCmotor_Speed_Ctrl_DW.obj_m.isInitialized == 1L) &&
@@ -1215,8 +1217,8 @@ void DCmotor_Speed_Ctrl_terminate(void)
     }
   }
 
-  /* End of Terminate for MATLABSystem: '<Root>/PWM' */
-  /* Terminate for MATLABSystem: '<S1>/Encoder1' */
+  /* End of Terminate for MATLABSystem: '<S1>/PWM' */
+  /* Terminate for MATLABSystem: '<S2>/Encoder1' */
   if (!DCmotor_Speed_Ctrl_DW.obj.matlabCodegenIsDeleted) {
     DCmotor_Speed_Ctrl_DW.obj.matlabCodegenIsDeleted = true;
     if ((DCmotor_Speed_Ctrl_DW.obj.isInitialized == 1L) &&
@@ -1225,7 +1227,7 @@ void DCmotor_Speed_Ctrl_terminate(void)
     }
   }
 
-  /* End of Terminate for MATLABSystem: '<S1>/Encoder1' */
+  /* End of Terminate for MATLABSystem: '<S2>/Encoder1' */
 }
 
 /*

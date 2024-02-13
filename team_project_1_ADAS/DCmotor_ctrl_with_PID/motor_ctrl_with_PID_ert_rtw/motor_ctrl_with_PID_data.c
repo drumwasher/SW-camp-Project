@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'motor_ctrl_with_PID'.
  *
- * Model version                  : 1.32
+ * Model version                  : 1.37
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb 10 22:03:59 2024
+ * C/C++ source code generated on : Mon Feb 12 21:58:13 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -21,55 +21,120 @@
 
 /* Block parameters (default storage) */
 P_motor_ctrl_with_PID_T motor_ctrl_with_PID_P = {
+  /* Variable: KD
+   * Referenced by: '<S3>/Gain3'
+   */
+  0.01,
+
+  /* Variable: KI
+   * Referenced by: '<S3>/Gain1'
+   */
+  0.2,
+
+  /* Variable: KP
+   * Referenced by: '<S3>/Gain2'
+   */
+  0.05,
+
+  /* Variable: Vlim
+   * Referenced by: '<S2>/Gain1'
+   */
+  12.0,
+
   /* Variable: Wref
-   * Referenced by: '<S1>/Step2'
+   * Referenced by: '<Root>/Step1'
    */
   128.0,
 
   /* Variable: den_Gd
-   * Referenced by: '<S2>/Discrete Transfer Fcn'
+   * Referenced by: '<S1>/Discrete Transfer Fcn'
    */
   { 1073741824, -879105452 },
 
   /* Variable: encoder_scale
-   * Referenced by: '<S2>/Gain1'
+   * Referenced by: '<S1>/Gain1'
    */
   1124419809,
 
   /* Variable: num_Gd
-   * Referenced by: '<S2>/Discrete Transfer Fcn'
+   * Referenced by: '<S1>/Discrete Transfer Fcn'
    */
   { 0, 1557090975 },
 
   /* Mask Parameter: DiscreteDerivative_ICPrevScaled
-   * Referenced by: '<S3>/UD'
+   * Referenced by: '<S4>/UD'
    */
   0,
 
   /* Expression: -1
-   * Referenced by: '<S2>/Encoder'
+   * Referenced by: '<Root>/Analog Input'
+   */
+  -1.0,
+
+  /* Expression: -1
+   * Referenced by: '<S1>/Encoder'
    */
   -1.0,
 
   /* Expression: 1
-   * Referenced by: '<S1>/Step2'
+   * Referenced by: '<Root>/Step1'
    */
   1.0,
 
   /* Expression: 0
-   * Referenced by: '<S1>/Step2'
+   * Referenced by: '<Root>/Step1'
    */
   0.0,
 
+  /* Expression: 0
+   * Referenced by: '<S3>/Integrator2'
+   */
+  0.0,
+
+  /* Expression: 128
+   * Referenced by: '<Root>/Constant'
+   */
+  128.0,
+
+  /* Expression: 6.4
+   * Referenced by: '<Root>/Constant1'
+   */
+  6.4,
+
+  /* Expression: 100
+   * Referenced by: '<Root>/Constant2'
+   */
+  100.0,
+
+  /* Expression: 12
+   * Referenced by: '<Root>/Saturation1'
+   */
+  12.0,
+
+  /* Expression: 0
+   * Referenced by: '<Root>/Saturation1'
+   */
+  0.0,
+
+  /* Expression: 1
+   * Referenced by: '<Root>/Constant4'
+   */
+  1.0,
+
   /* Computed Parameter: Gain2_Gain
-   * Referenced by: '<S2>/Gain2'
+   * Referenced by: '<S1>/Gain2'
    */
   { { 0xB4AFEC00UL, 0x4C64F59BUL } },
 
   /* Computed Parameter: DiscreteTransferFcn_InitialStat
-   * Referenced by: '<S2>/Discrete Transfer Fcn'
+   * Referenced by: '<S1>/Discrete Transfer Fcn'
    */
-  0
+  0,
+
+  /* Computed Parameter: Gain_Gain
+   * Referenced by: '<Root>/Gain'
+   */
+  32768U
 };
 
 /*

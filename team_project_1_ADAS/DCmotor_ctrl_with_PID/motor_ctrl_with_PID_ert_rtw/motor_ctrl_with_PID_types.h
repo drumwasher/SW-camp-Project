@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'motor_ctrl_with_PID'.
  *
- * Model version                  : 1.32
+ * Model version                  : 1.37
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Sat Feb 10 22:03:59 2024
+ * C/C++ source code generated on : Mon Feb 12 21:58:13 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -22,8 +22,105 @@
 #include "MW_SVD.h"
 #include "rtwtypes.h"
 
-/* Custom Type definition for MATLABSystem: '<S1>/PWM' */
+/* Custom Type definition for MATLABSystem: '<S2>/PWM' */
 #include "MW_SVD.h"
+#ifndef struct_tag_UTG5XI0vJCsmjbgura8BP
+#define struct_tag_UTG5XI0vJCsmjbgura8BP
+
+struct tag_UTG5XI0vJCsmjbgura8BP
+{
+  MW_Handle_Type MW_ANALOGIN_HANDLE;
+};
+
+#endif                                 /* struct_tag_UTG5XI0vJCsmjbgura8BP */
+
+#ifndef typedef_g_arduinodriver_ArduinoAnalog_T
+#define typedef_g_arduinodriver_ArduinoAnalog_T
+
+typedef struct tag_UTG5XI0vJCsmjbgura8BP g_arduinodriver_ArduinoAnalog_T;
+
+#endif                             /* typedef_g_arduinodriver_ArduinoAnalog_T */
+
+#ifndef struct_tag_8ohiN1FAOgR98njPNu14NC
+#define struct_tag_8ohiN1FAOgR98njPNu14NC
+
+struct tag_8ohiN1FAOgR98njPNu14NC
+{
+  boolean_T matlabCodegenIsDeleted;
+  int32_T isInitialized;
+  boolean_T isSetupComplete;
+  g_arduinodriver_ArduinoAnalog_T AnalogInDriverObj;
+  real_T SampleTime;
+};
+
+#endif                                 /* struct_tag_8ohiN1FAOgR98njPNu14NC */
+
+#ifndef typedef_codertarget_arduinobase_inter_T
+#define typedef_codertarget_arduinobase_inter_T
+
+typedef struct tag_8ohiN1FAOgR98njPNu14NC codertarget_arduinobase_inter_T;
+
+#endif                             /* typedef_codertarget_arduinobase_inter_T */
+
+#ifndef struct_tag_04b6x6tDldj9IrIH2gmbjG
+#define struct_tag_04b6x6tDldj9IrIH2gmbjG
+
+struct tag_04b6x6tDldj9IrIH2gmbjG
+{
+  int16_T __dummy;
+};
+
+#endif                                 /* struct_tag_04b6x6tDldj9IrIH2gmbjG */
+
+#ifndef typedef_b_arduinodriver_ArduinoDigita_T
+#define typedef_b_arduinodriver_ArduinoDigita_T
+
+typedef struct tag_04b6x6tDldj9IrIH2gmbjG b_arduinodriver_ArduinoDigita_T;
+
+#endif                             /* typedef_b_arduinodriver_ArduinoDigita_T */
+
+#ifndef struct_tag_AYWgtFscQm3mLUJYb3A20C
+#define struct_tag_AYWgtFscQm3mLUJYb3A20C
+
+struct tag_AYWgtFscQm3mLUJYb3A20C
+{
+  boolean_T matlabCodegenIsDeleted;
+  int32_T isInitialized;
+  boolean_T isSetupComplete;
+  b_arduinodriver_ArduinoDigita_T DigitalIODriverObj;
+};
+
+#endif                                 /* struct_tag_AYWgtFscQm3mLUJYb3A20C */
+
+#ifndef typedef_codertarget_arduinobase_block_T
+#define typedef_codertarget_arduinobase_block_T
+
+typedef struct tag_AYWgtFscQm3mLUJYb3A20C codertarget_arduinobase_block_T;
+
+#endif                             /* typedef_codertarget_arduinobase_block_T */
+
+#ifndef struct_tag_hiATgaifu8RfrjZ2yifYbH
+#define struct_tag_hiATgaifu8RfrjZ2yifYbH
+
+struct tag_hiATgaifu8RfrjZ2yifYbH
+{
+  boolean_T matlabCodegenIsDeleted;
+  int32_T isInitialized;
+  boolean_T isSetupComplete;
+  boolean_T TunablePropsChanged;
+  real_T SampleTime;
+  uint8_T Index;
+};
+
+#endif                                 /* struct_tag_hiATgaifu8RfrjZ2yifYbH */
+
+#ifndef typedef_codertarget_arduinobase_int_i_T
+#define typedef_codertarget_arduinobase_int_i_T
+
+typedef struct tag_hiATgaifu8RfrjZ2yifYbH codertarget_arduinobase_int_i_T;
+
+#endif                             /* typedef_codertarget_arduinobase_int_i_T */
+
 #ifndef struct_tag_g1WX34VPn8QzVKQriB4HN
 #define struct_tag_g1WX34VPn8QzVKQriB4HN
 
@@ -54,34 +151,12 @@ struct tag_4eDVzK5FiryyCjvjjvrZGB
 
 #endif                                 /* struct_tag_4eDVzK5FiryyCjvjjvrZGB */
 
-#ifndef typedef_codertarget_arduinobase_inter_T
-#define typedef_codertarget_arduinobase_inter_T
+#ifndef typedef_codertarget_arduinobase_in_ix_T
+#define typedef_codertarget_arduinobase_in_ix_T
 
-typedef struct tag_4eDVzK5FiryyCjvjjvrZGB codertarget_arduinobase_inter_T;
+typedef struct tag_4eDVzK5FiryyCjvjjvrZGB codertarget_arduinobase_in_ix_T;
 
-#endif                             /* typedef_codertarget_arduinobase_inter_T */
-
-#ifndef struct_tag_hiATgaifu8RfrjZ2yifYbH
-#define struct_tag_hiATgaifu8RfrjZ2yifYbH
-
-struct tag_hiATgaifu8RfrjZ2yifYbH
-{
-  boolean_T matlabCodegenIsDeleted;
-  int32_T isInitialized;
-  boolean_T isSetupComplete;
-  boolean_T TunablePropsChanged;
-  real_T SampleTime;
-  uint8_T Index;
-};
-
-#endif                                 /* struct_tag_hiATgaifu8RfrjZ2yifYbH */
-
-#ifndef typedef_codertarget_arduinobase_int_i_T
-#define typedef_codertarget_arduinobase_int_i_T
-
-typedef struct tag_hiATgaifu8RfrjZ2yifYbH codertarget_arduinobase_int_i_T;
-
-#endif                             /* typedef_codertarget_arduinobase_int_i_T */
+#endif                             /* typedef_codertarget_arduinobase_in_ix_T */
 
 /* Parameters (default storage) */
 typedef struct P_motor_ctrl_with_PID_T_ P_motor_ctrl_with_PID_T;

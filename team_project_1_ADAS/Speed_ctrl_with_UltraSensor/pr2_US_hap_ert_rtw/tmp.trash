@@ -1,0 +1,9 @@
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9801 (probably m2560)
+avrdude: reading input file "C:\Users\tkdle\OneDrive\πŸ≈¡ »≠∏È\SW-camp-Project\team_project_1_ADAS\Speed_ctrl_with_UltraSensor/pr2_US_hap.hex"
+avrdude: writing flash (42082 bytes):
+avrdude: 42082 bytes of flash written
+
+avrdude done.  Thank you.
+

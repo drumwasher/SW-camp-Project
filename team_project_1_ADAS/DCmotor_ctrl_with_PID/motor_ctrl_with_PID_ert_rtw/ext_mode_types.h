@@ -7,9 +7,9 @@
  *
  * Code generation for model "motor_ctrl_with_PID".
  *
- * Model version              : 1.32
+ * Model version              : 1.37
  * Simulink Coder version : 23.2 (R2023b) 01-Aug-2023
- * C source code generated on : Sat Feb 10 22:03:59 2024
+ * C source code generated on : Mon Feb 12 21:58:13 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

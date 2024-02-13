@@ -2,7 +2,7 @@
 ## Makefile generated for component 'DCmotor_Speed_Ctrl'. 
 ## 
 ## Makefile     : DCmotor_Speed_Ctrl.mk
-## Generated on : Fri Feb 09 10:01:09 2024
+## Generated on : Sat Feb 10 22:59:13 2024
 ## Final product: $(RELATIVE_PATH_TO_ANCHOR)/DCmotor_Speed_Ctrl.elf
 ## Product type : executable
 ## 
@@ -21,7 +21,7 @@ MAKEFILE                  = DCmotor_Speed_Ctrl.mk
 MATLAB_ROOT               = C:/PROGRA~1/MATLAB/R2023b
 MATLAB_BIN                = C:/PROGRA~1/MATLAB/R2023b/bin
 MATLAB_ARCH_BIN           = $(MATLAB_BIN)/win64
-START_DIR                 = C:/Users/tkdle/OneDrive/πŸ≈¡»≠~1/SW-CAM~1/TEAM_P~1/EX_DCM~1
+START_DIR                 = C:/Users/tkdle/OneDrive/πŸ≈¡»≠~1/SW-CAM~1/2_WEEK~1/EX_DCM~1
 SOLVER                    = 
 SOLVER_OBJ                = 
 CLASSIC_INTERFACE         = 0

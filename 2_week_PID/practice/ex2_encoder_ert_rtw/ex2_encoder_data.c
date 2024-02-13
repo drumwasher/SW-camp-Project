@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ex2_encoder'.
  *
- * Model version                  : 1.28
+ * Model version                  : 1.31
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Fri Feb  9 21:52:13 2024
+ * C/C++ source code generated on : Sun Feb 11 15:59:07 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -22,29 +22,24 @@
 /* Block parameters (default storage) */
 P_ex2_encoder_T ex2_encoder_P = {
   /* Variable: KD
-   * Referenced by: '<S3>/Gain3'
+   * Referenced by: '<S3>/Gain6'
    */
-  0.01,
+  0.5,
 
   /* Variable: KI
-   * Referenced by: '<S3>/Gain1'
+   * Referenced by: '<S3>/Gain4'
    */
-  0.2,
+  0.1,
 
   /* Variable: KP
-   * Referenced by: '<S3>/Gain2'
+   * Referenced by: '<S3>/Gain5'
    */
-  0.05,
+  0.7,
 
   /* Variable: Vlim
    * Referenced by: '<S2>/Gain1'
    */
   12.0,
-
-  /* Variable: Wref
-   * Referenced by: '<Root>/Step1'
-   */
-  442.0,
 
   /* Variable: den_Gd
    * Referenced by: '<S1>/Discrete Transfer Fcn'
@@ -62,7 +57,7 @@ P_ex2_encoder_T ex2_encoder_P = {
   { 0, 1557090975 },
 
   /* Mask Parameter: DiscreteDerivative_ICPrevScaled
-   * Referenced by: '<S5>/UD'
+   * Referenced by: '<S4>/UD'
    */
   0,
 
@@ -76,43 +71,18 @@ P_ex2_encoder_T ex2_encoder_P = {
    */
   -1.0,
 
-  /* Expression: 1
-   * Referenced by: '<Root>/Step1'
-   */
-  1.0,
-
   /* Expression: 0
-   * Referenced by: '<Root>/Step1'
+   * Referenced by: '<S3>/Integrator1'
    */
   0.0,
-
-  /* Expression: 0
-   * Referenced by: '<S3>/Integrator2'
-   */
-  0.0,
-
-  /* Expression: 128
-   * Referenced by: '<Root>/Constant'
-   */
-  128.0,
-
-  /* Expression: 6.4
-   * Referenced by: '<Root>/Constant1'
-   */
-  6.4,
-
-  /* Expression: 100
-   * Referenced by: '<Root>/Constant2'
-   */
-  100.0,
 
   /* Expression: 12
-   * Referenced by: '<Root>/Saturation1'
+   * Referenced by: '<Root>/Saturation'
    */
   12.0,
 
   /* Expression: 0
-   * Referenced by: '<Root>/Saturation1'
+   * Referenced by: '<Root>/Saturation'
    */
   0.0,
 

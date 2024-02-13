@@ -2,7 +2,7 @@ MW_PWM.o: \
  C:\ProgramData\MATLAB\SupportPackages\R2023b\toolbox\target\supportpackages\arduinobase\src\MW_PWM.cpp \
  C:/PROGRA~1/MATLAB/R2023b/toolbox/target/shared/svd/common/include/MW_PWM.h \
  C:/PROGRA~1/MATLAB/R2023b/toolbox/target/shared/svd/common/include/MW_SVD.h \
- C:/Users/tkdle/OneDrive/πŸ≈¡»≠~1/SW-CAM~1/TEAM_P~1/EX_DCM~1/DCmotor_Speed_Ctrl_ert_rtw/rtwtypes.h \
+ C:/Users/tkdle/OneDrive/πŸ≈¡»≠~1/SW-CAM~1/2_WEEK~1/EX_DCM~1/DCmotor_Speed_Ctrl_ert_rtw/rtwtypes.h \
  C:/PROGRA~3/MATLAB/SUPPOR~1/R2023b/toolbox/target/SUPPOR~1/ARDUIN~2/include/MW_PWMDriver.h \
  C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/cores/arduino/Arduino.h \
  C:/ProgramData/MATLAB/SupportPackages/R2023b/aIDE/hardware/arduino/avr/cores/arduino/binary.h \
@@ -20,7 +20,7 @@ C:/PROGRA~1/MATLAB/R2023b/toolbox/target/shared/svd/common/include/MW_PWM.h:
 
 C:/PROGRA~1/MATLAB/R2023b/toolbox/target/shared/svd/common/include/MW_SVD.h:
 
-C:/Users/tkdle/OneDrive/πŸ≈¡»≠~1/SW-CAM~1/TEAM_P~1/EX_DCM~1/DCmotor_Speed_Ctrl_ert_rtw/rtwtypes.h:
+C:/Users/tkdle/OneDrive/πŸ≈¡»≠~1/SW-CAM~1/2_WEEK~1/EX_DCM~1/DCmotor_Speed_Ctrl_ert_rtw/rtwtypes.h:
 
 C:/PROGRA~3/MATLAB/SUPPOR~1/R2023b/toolbox/target/SUPPOR~1/ARDUIN~2/include/MW_PWMDriver.h:
 

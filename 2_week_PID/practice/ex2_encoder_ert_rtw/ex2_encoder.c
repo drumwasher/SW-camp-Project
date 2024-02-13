@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'ex2_encoder'.
  *
- * Model version                  : 1.28
+ * Model version                  : 1.31
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Fri Feb  9 21:52:13 2024
+ * C/C++ source code generated on : Sun Feb 11 15:59:07 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -802,7 +802,7 @@ void ex2_encoder_step(void)
 
   {
     real_T lastTime;
-    real_T rtb_Add3;
+    real_T rtb_Add1;
     real_T rtb_Gain1;
     real_T *lastU;
     int32_T tmp;
@@ -815,17 +815,6 @@ void ex2_encoder_step(void)
     static const int64m_T tmp_3 = { { 25UL, 0UL }/* chunks */
     };
 
-    /* Step: '<Root>/Step1' */
-    if (ex2_encoder_M->Timing.t[0] < ex2_encoder_P.Step1_Time) {
-      /* Step: '<Root>/Step1' */
-      ex2_encoder_B.Step1 = ex2_encoder_P.Step1_Y0;
-    } else {
-      /* Step: '<Root>/Step1' */
-      ex2_encoder_B.Step1 = ex2_encoder_P.Wref;
-    }
-
-    /* End of Step: '<Root>/Step1' */
-
     /* MATLABSystem: '<Root>/Analog Input' */
     if (ex2_encoder_DW.obj_j.SampleTime != ex2_encoder_P.AnalogInput_SampleTime)
     {
@@ -837,29 +826,6 @@ void ex2_encoder_step(void)
     MW_AnalogInSingle_ReadResult
       (ex2_encoder_DW.obj_j.AnalogInDriverObj.MW_ANALOGIN_HANDLE, &b_varargout_1,
        MW_ANALOGIN_UINT16);
-
-    /* DataTypeConversion: '<Root>/Data Type Conversion' incorporates:
-     *  Gain: '<Root>/Gain'
-     *  MATLABSystem: '<Root>/Analog Input'
-     * */
-    ex2_encoder_B.DataTypeConversion = (uint8_T)(((uint32_T)
-      ex2_encoder_P.Gain_Gain * b_varargout_1) >> 17);
-
-    /* Product: '<Root>/Divide1' incorporates:
-     *  Constant: '<Root>/Constant'
-     *  Constant: '<Root>/Constant1'
-     *  Sum: '<Root>/Add2'
-     */
-    ex2_encoder_B.Divide1 = ((real_T)ex2_encoder_B.DataTypeConversion -
-      ex2_encoder_P.Constant_Value) / ex2_encoder_P.Constant1_Value;
-
-    /* Sum: '<Root>/Add4' incorporates:
-     *  Constant: '<Root>/Constant2'
-     *  Product: '<Root>/Divide2'
-     *  Product: '<Root>/Divide3'
-     */
-    ex2_encoder_B.Add4 = ex2_encoder_B.Step1 - ex2_encoder_B.Divide1 /
-      ex2_encoder_P.Constant2_Value * ex2_encoder_B.Step1;
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
       /* DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
       ex2_encoder_B.DiscreteTransferFcn = tmp_2;
@@ -871,17 +837,21 @@ void ex2_encoder_step(void)
                     &ex2_encoder_B.DiscreteTransferFcn.chunks[0U], 2);
     }
 
-    /* Sum: '<Root>/Add3' incorporates:
+    /* Sum: '<Root>/Add1' incorporates:
+     *  DataTypeConversion: '<Root>/Data Type Conversion'
      *  DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn'
-     */
-    rtb_Add3 = ex2_encoder_B.Add4 - sMultiWord2Double
+     *  Gain: '<Root>/Gain'
+     *  MATLABSystem: '<Root>/Analog Input'
+     * */
+    rtb_Add1 = (real_T)((uint32_T)ex2_encoder_P.Gain_Gain * b_varargout_1) *
+      7.62939453125E-6 - sMultiWord2Double
       (&ex2_encoder_B.DiscreteTransferFcn.chunks[0U], 2, 0) *
       1.1641532182693481E-10;
 
-    /* Gain: '<S3>/Gain3' */
-    ex2_encoder_B.Gain3 = ex2_encoder_P.KD * rtb_Add3;
+    /* Gain: '<S3>/Gain6' */
+    ex2_encoder_B.Gain6 = ex2_encoder_P.KD * rtb_Add1;
 
-    /* Derivative: '<S3>/Derivative2' */
+    /* Derivative: '<S3>/Derivative1' */
     rtb_Gain1 = ex2_encoder_M->Timing.t[0];
     if ((ex2_encoder_DW.TimeStampA >= rtb_Gain1) && (ex2_encoder_DW.TimeStampB >=
          rtb_Gain1)) {
@@ -899,36 +869,36 @@ void ex2_encoder_step(void)
         lastU = &ex2_encoder_DW.LastUAtTimeB;
       }
 
-      rtb_Gain1 = (ex2_encoder_B.Gain3 - *lastU) / (rtb_Gain1 - lastTime);
+      rtb_Gain1 = (ex2_encoder_B.Gain6 - *lastU) / (rtb_Gain1 - lastTime);
     }
 
-    /* End of Derivative: '<S3>/Derivative2' */
+    /* End of Derivative: '<S3>/Derivative1' */
 
-    /* Sum: '<S3>/Subtract2' incorporates:
-     *  Gain: '<S3>/Gain2'
-     *  Integrator: '<S3>/Integrator2'
+    /* Sum: '<S3>/Subtract1' incorporates:
+     *  Gain: '<S3>/Gain5'
+     *  Integrator: '<S3>/Integrator1'
      */
-    ex2_encoder_B.Subtract2 = (ex2_encoder_P.KP * rtb_Add3 +
-      ex2_encoder_X.Integrator2_CSTATE) + rtb_Gain1;
+    ex2_encoder_B.Subtract1 = (ex2_encoder_P.KP * rtb_Add1 +
+      ex2_encoder_X.Integrator1_CSTATE) + rtb_Gain1;
 
-    /* Saturate: '<Root>/Saturation1' */
-    if (ex2_encoder_B.Subtract2 > ex2_encoder_P.Saturation1_UpperSat) {
-      /* Saturate: '<Root>/Saturation1' */
-      ex2_encoder_B.Saturation1 = ex2_encoder_P.Saturation1_UpperSat;
-    } else if (ex2_encoder_B.Subtract2 < ex2_encoder_P.Saturation1_LowerSat) {
-      /* Saturate: '<Root>/Saturation1' */
-      ex2_encoder_B.Saturation1 = ex2_encoder_P.Saturation1_LowerSat;
+    /* Saturate: '<Root>/Saturation' */
+    if (ex2_encoder_B.Subtract1 > ex2_encoder_P.Saturation_UpperSat) {
+      /* Saturate: '<Root>/Saturation' */
+      ex2_encoder_B.Saturation = ex2_encoder_P.Saturation_UpperSat;
+    } else if (ex2_encoder_B.Subtract1 < ex2_encoder_P.Saturation_LowerSat) {
+      /* Saturate: '<Root>/Saturation' */
+      ex2_encoder_B.Saturation = ex2_encoder_P.Saturation_LowerSat;
     } else {
-      /* Saturate: '<Root>/Saturation1' */
-      ex2_encoder_B.Saturation1 = ex2_encoder_B.Subtract2;
+      /* Saturate: '<Root>/Saturation' */
+      ex2_encoder_B.Saturation = ex2_encoder_B.Subtract1;
     }
 
-    /* End of Saturate: '<Root>/Saturation1' */
+    /* End of Saturate: '<Root>/Saturation' */
 
     /* DataTypeConversion: '<S2>/Data Type Conversion' incorporates:
      *  Gain: '<S2>/Gain1'
      */
-    rtb_Gain1 = floor(255.0 / ex2_encoder_P.Vlim * ex2_encoder_B.Saturation1);
+    rtb_Gain1 = floor(255.0 / ex2_encoder_P.Vlim * ex2_encoder_B.Saturation);
     if (rtIsNaN(rtb_Gain1) || rtIsInf(rtb_Gain1)) {
       rtb_Gain1 = 0.0;
     } else {
@@ -936,14 +906,14 @@ void ex2_encoder_step(void)
     }
 
     /* DataTypeConversion: '<S2>/Data Type Conversion' */
-    ex2_encoder_B.DataTypeConversion_h = (uint8_T)(rtb_Gain1 < 0.0 ? (int16_T)
+    ex2_encoder_B.DataTypeConversion = (uint8_T)(rtb_Gain1 < 0.0 ? (int16_T)
       (uint8_T)-(int8_T)(uint8_T)-rtb_Gain1 : (int16_T)(uint8_T)rtb_Gain1);
 
     /* DataTypeConversion: '<S2>/Data Type Conversion1' */
-    ex2_encoder_B.DataTypeConversion1 = ex2_encoder_B.DataTypeConversion_h;
+    ex2_encoder_B.DataTypeConversion1 = ex2_encoder_B.DataTypeConversion;
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
-      /* SignalConversion generated from: '<Root>/Mux2' */
-      ex2_encoder_B.TmpSignalConversionAtTAQSigLogg[0] = ex2_encoder_B.Step1;
+      /* SignalConversion generated from: '<Root>/Mux1' */
+      ex2_encoder_B.TmpSignalConversionAtTAQSigLogg[0] = 0.0;
       ex2_encoder_B.TmpSignalConversionAtTAQSigLogg[1] =
         ex2_encoder_B.DataTypeConversion1;
     }
@@ -951,12 +921,12 @@ void ex2_encoder_step(void)
     /* MATLABSystem: '<S2>/PWM' */
     ex2_encoder_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE = MW_PWM_GetHandle(11UL);
     MW_PWM_SetDutyCycle(ex2_encoder_DW.obj_p.PWMDriverObj.MW_PWM_HANDLE, (real_T)
-                        ex2_encoder_B.DataTypeConversion_h);
+                        ex2_encoder_B.DataTypeConversion);
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
     }
 
-    /* Gain: '<S3>/Gain1' */
-    ex2_encoder_B.Gain1_e = ex2_encoder_P.KI * rtb_Add3;
+    /* Gain: '<S3>/Gain4' */
+    ex2_encoder_B.Gain4 = ex2_encoder_P.KI * rtb_Add1;
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
     }
 
@@ -971,10 +941,10 @@ void ex2_encoder_step(void)
 
     MW_EncoderRead(ex2_encoder_DW.obj.Index, &tmp);
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
-      /* SampleTimeMath: '<S5>/TSamp' incorporates:
+      /* SampleTimeMath: '<S4>/TSamp' incorporates:
        *  MATLABSystem: '<S1>/Encoder'
        *
-       * About '<S5>/TSamp':
+       * About '<S4>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -985,11 +955,11 @@ void ex2_encoder_step(void)
       rtb_TSamp = tmp;
 
       /* Gain: '<S1>/Gain1' incorporates:
-       *  SampleTimeMath: '<S5>/TSamp'
-       *  Sum: '<S5>/Diff'
-       *  UnitDelay: '<S5>/UD'
+       *  SampleTimeMath: '<S4>/TSamp'
+       *  Sum: '<S4>/Diff'
+       *  UnitDelay: '<S4>/UD'
        *
-       * About '<S5>/TSamp':
+       * About '<S4>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -997,11 +967,11 @@ void ex2_encoder_step(void)
        *  to do work to handle the scaling of the output; this happens
        *  automatically.
        *
-       * Block description for '<S5>/Diff':
+       * Block description for '<S4>/Diff':
        *
        *  Add in CPU
        *
-       * Block description for '<S5>/UD':
+       * Block description for '<S4>/UD':
        *
        *  Store in Global RAM
        */
@@ -1025,7 +995,7 @@ void ex2_encoder_step(void)
                     &ex2_encoder_B.r1.chunks[0U], 4);
 
       /* DataTypeConversion: '<S1>/Data Type Conversion1' */
-      ex2_encoder_B.DataTypeConversion1_m = MultiWord2sLong
+      ex2_encoder_B.DataTypeConversion1_e = MultiWord2sLong
         (&ex2_encoder_B.r1.chunks[0U]);
     }
   }
@@ -1050,7 +1020,7 @@ void ex2_encoder_step(void)
 
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
       /* Update for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
-      sLong2MultiWord(ex2_encoder_B.DataTypeConversion1_m, &tmp_0.chunks[0U], 2);
+      sLong2MultiWord(ex2_encoder_B.DataTypeConversion1_e, &tmp_0.chunks[0U], 2);
       sMultiWordShl(&tmp_0.chunks[0U], 2, 30U, &denAccum.chunks[0U], 2);
       tmp_1 = (uint32_T)ex2_encoder_P.den_Gd[1L];
       tmp_2 = (uint32_T)ex2_encoder_DW.DiscreteTransferFcn_states;
@@ -1085,7 +1055,7 @@ void ex2_encoder_step(void)
       /* End of Update for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
     }
 
-    /* Update for Derivative: '<S3>/Derivative2' */
+    /* Update for Derivative: '<S3>/Derivative1' */
     if (ex2_encoder_DW.TimeStampA == (rtInf)) {
       ex2_encoder_DW.TimeStampA = ex2_encoder_M->Timing.t[0];
       lastU = &ex2_encoder_DW.LastUAtTimeA;
@@ -1100,14 +1070,14 @@ void ex2_encoder_step(void)
       lastU = &ex2_encoder_DW.LastUAtTimeB;
     }
 
-    *lastU = ex2_encoder_B.Gain3;
+    *lastU = ex2_encoder_B.Gain6;
 
-    /* End of Update for Derivative: '<S3>/Derivative2' */
+    /* End of Update for Derivative: '<S3>/Derivative1' */
     if (rtmIsMajorTimeStep(ex2_encoder_M)) {
-      /* Update for UnitDelay: '<S5>/UD' incorporates:
-       *  SampleTimeMath: '<S5>/TSamp'
+      /* Update for UnitDelay: '<S4>/UD' incorporates:
+       *  SampleTimeMath: '<S4>/TSamp'
        *
-       * About '<S5>/TSamp':
+       * About '<S4>/TSamp':
        *  y = u * K where K = 1 / ( w * Ts )
        *  Multiplication by K = weightedTsampQuantized is being
        *  done implicitly by changing the scaling of the input signal.
@@ -1115,7 +1085,7 @@ void ex2_encoder_step(void)
        *  to do work to handle the scaling of the output; this happens
        *  automatically.
        *
-       * Block description for '<S5>/UD':
+       * Block description for '<S4>/UD':
        *
        *  Store in Global RAM
        */
@@ -1182,8 +1152,8 @@ void ex2_encoder_derivatives(void)
   XDot_ex2_encoder_T *_rtXdot;
   _rtXdot = ((XDot_ex2_encoder_T *) ex2_encoder_M->derivs);
 
-  /* Derivatives for Integrator: '<S3>/Integrator2' */
-  _rtXdot->Integrator2_CSTATE = ex2_encoder_B.Gain1_e;
+  /* Derivatives for Integrator: '<S3>/Integrator1' */
+  _rtXdot->Integrator1_CSTATE = ex2_encoder_B.Gain4;
 }
 
 /* Model initialize function */
@@ -1235,10 +1205,10 @@ void ex2_encoder_initialize(void)
   ex2_encoder_M->Timing.stepSize0 = 0.01;
 
   /* External mode info */
-  ex2_encoder_M->Sizes.checksums[0] = (904426300U);
-  ex2_encoder_M->Sizes.checksums[1] = (1920185800U);
-  ex2_encoder_M->Sizes.checksums[2] = (4198089143U);
-  ex2_encoder_M->Sizes.checksums[3] = (3469071780U);
+  ex2_encoder_M->Sizes.checksums[0] = (4150116650U);
+  ex2_encoder_M->Sizes.checksums[1] = (1483693761U);
+  ex2_encoder_M->Sizes.checksums[2] = (69882193U);
+  ex2_encoder_M->Sizes.checksums[3] = (801234658U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
@@ -1257,20 +1227,20 @@ void ex2_encoder_initialize(void)
     rteiSetTPtr(ex2_encoder_M->extModeInfo, rtmGetTPtr(ex2_encoder_M));
   }
 
-  /* InitializeConditions for Integrator: '<S3>/Integrator2' */
-  ex2_encoder_X.Integrator2_CSTATE = ex2_encoder_P.Integrator2_IC;
+  /* InitializeConditions for Integrator: '<S3>/Integrator1' */
+  ex2_encoder_X.Integrator1_CSTATE = ex2_encoder_P.Integrator1_IC;
 
   /* InitializeConditions for DiscreteTransferFcn: '<S1>/Discrete Transfer Fcn' */
   ex2_encoder_DW.DiscreteTransferFcn_states =
     ex2_encoder_P.DiscreteTransferFcn_InitialStat;
 
-  /* InitializeConditions for Derivative: '<S3>/Derivative2' */
+  /* InitializeConditions for Derivative: '<S3>/Derivative1' */
   ex2_encoder_DW.TimeStampA = (rtInf);
   ex2_encoder_DW.TimeStampB = (rtInf);
 
-  /* InitializeConditions for UnitDelay: '<S5>/UD'
+  /* InitializeConditions for UnitDelay: '<S4>/UD'
    *
-   * Block description for '<S5>/UD':
+   * Block description for '<S4>/UD':
    *
    *  Store in Global RAM
    */
@@ -1295,7 +1265,7 @@ void ex2_encoder_initialize(void)
   ex2_encoder_DW.obj.matlabCodegenIsDeleted = false;
   ex2_encoder_DW.obj.SampleTime = ex2_encoder_P.Encoder_SampleTime;
   ex2_encoder_DW.obj.isInitialized = 1L;
-  MW_EncoderSetup(18UL, 19UL, &ex2_encoder_DW.obj.Index);
+  MW_EncoderSetup(20UL, 21UL, &ex2_encoder_DW.obj.Index);
   ex2_encoder_DW.obj.isSetupComplete = true;
   ex2_encoder_DW.obj.TunablePropsChanged = false;
 

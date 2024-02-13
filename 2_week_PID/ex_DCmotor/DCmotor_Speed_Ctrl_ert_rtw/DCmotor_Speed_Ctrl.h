@@ -9,7 +9,7 @@
  *
  * Model version                  : 1.37
  * Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
- * C/C++ source code generated on : Fri Feb  9 10:04:18 2024
+ * C/C++ source code generated on : Sat Feb 10 22:59:09 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -173,29 +173,29 @@
 
 /* Block signals (default storage) */
 typedef struct {
-  int128m_T RPM;                       /* '<S1>/RPM' */
+  int128m_T RPM;                       /* '<S2>/RPM' */
   int128m_T r;
   int96m_T r1;
   int96m_T r2;
   int96m_T r3;
   int96m_T r4;
-  int64m_T mtr_rads;                   /* '<S1>/mtr_rad//s' */
-  int64m_T Wrads;                      /* '<S1>/Discrete Transfer Fcn' */
+  int64m_T mtr_rads;                   /* '<S2>/mtr_rad//s' */
+  int64m_T Wrads;                      /* '<S2>/Discrete Transfer Fcn' */
   real_T Wref;                         /* '<Root>/Wref1' */
   real_T Add3;                         /* '<Root>/Add3' */
-  int32_T Wrads_c;                     /* '<S1>/Data Type Conversion1' */
+  int32_T DataTypeConversion1;         /* '<S2>/Data Type Conversion1' */
 } B_DCmotor_Speed_Ctrl_T;
 
 /* Block states (default storage) for system '<Root>' */
 typedef struct {
-  codertarget_arduinobase_int_o_T obj; /* '<S1>/Encoder1' */
-  codertarget_arduinobase_inter_T obj_m;/* '<Root>/PWM' */
+  codertarget_arduinobase_int_o_T obj; /* '<S2>/Encoder1' */
+  codertarget_arduinobase_inter_T obj_m;/* '<S1>/PWM' */
   struct {
     void *LoggedData[2];
   } Scope7_PWORK;                      /* '<Root>/Scope7' */
 
-  int32_T DiscreteTransferFcn_states;  /* '<S1>/Discrete Transfer Fcn' */
-  int32_T UD_DSTATE;                   /* '<S2>/UD' */
+  int32_T DiscreteTransferFcn_states;  /* '<S2>/Discrete Transfer Fcn' */
+  int32_T UD_DSTATE;                   /* '<S3>/UD' */
 } DW_DCmotor_Speed_Ctrl_T;
 
 /* Continuous states (default storage) */
@@ -230,28 +230,28 @@ struct P_DCmotor_Speed_Ctrl_T_ {
                                         * Referenced by: '<Root>/Gain2'
                                         */
   real_T Ts;                           /* Variable: Ts
-                                        * Referenced by: '<S1>/Encoder1'
+                                        * Referenced by: '<S2>/Encoder1'
                                         */
   real_T Vlim;                         /* Variable: Vlim
                                         * Referenced by:
-                                        *   '<Root>/Gain'
-                                        *   '<Root>/Saturation1'
+                                        *   '<S1>/Gain'
+                                        *   '<S1>/Saturation1'
                                         */
   real_T Wref;                         /* Variable: Wref
                                         * Referenced by: '<Root>/Wref1'
                                         */
   int32_T den_Gd[2];                   /* Variable: den_Gd
-                                        * Referenced by: '<S1>/Discrete Transfer Fcn'
+                                        * Referenced by: '<S2>/Discrete Transfer Fcn'
                                         */
   int32_T encoder_scale;               /* Variable: encoder_scale
-                                        * Referenced by: '<S1>/mtr_rad//s'
+                                        * Referenced by: '<S2>/mtr_rad//s'
                                         */
   int32_T num_Gd[2];                   /* Variable: num_Gd
-                                        * Referenced by: '<S1>/Discrete Transfer Fcn'
+                                        * Referenced by: '<S2>/Discrete Transfer Fcn'
                                         */
   int32_T DiscreteDerivative_ICPrevScaled;
                               /* Mask Parameter: DiscreteDerivative_ICPrevScaled
-                               * Referenced by: '<S2>/UD'
+                               * Referenced by: '<S3>/UD'
                                */
   real_T TransferFcn1_A;               /* Computed Parameter: TransferFcn1_A
                                         * Referenced by: '<Root>/Transfer Fcn1'
@@ -266,14 +266,14 @@ struct P_DCmotor_Speed_Ctrl_T_ {
                                         * Referenced by: '<Root>/Wref1'
                                         */
   real_T Saturation1_LowerSat;         /* Expression: 0
-                                        * Referenced by: '<Root>/Saturation1'
+                                        * Referenced by: '<S1>/Saturation1'
                                         */
   int64m_T RPM_Gain;                   /* Computed Parameter: RPM_Gain
-                                        * Referenced by: '<S1>/RPM'
+                                        * Referenced by: '<S2>/RPM'
                                         */
   int32_T DiscreteTransferFcn_InitialStat;
                           /* Computed Parameter: DiscreteTransferFcn_InitialStat
-                           * Referenced by: '<S1>/Discrete Transfer Fcn'
+                           * Referenced by: '<S2>/Discrete Transfer Fcn'
                            */
 };
 
@@ -362,7 +362,7 @@ extern volatile boolean_T runModel;
 /*-
  * These blocks were eliminated from the model due to optimizations:
  *
- * Block '<S2>/Data Type Duplicate' : Unused code path elimination
+ * Block '<S3>/Data Type Duplicate' : Unused code path elimination
  */
 
 /*-
@@ -380,8 +380,9 @@ extern volatile boolean_T runModel;
  * Here is the system hierarchy for this model
  *
  * '<Root>' : 'DCmotor_Speed_Ctrl'
- * '<S1>'   : 'DCmotor_Speed_Ctrl/Speed Calculator '
- * '<S2>'   : 'DCmotor_Speed_Ctrl/Speed Calculator /Discrete Derivative'
+ * '<S1>'   : 'DCmotor_Speed_Ctrl/Motor Driver'
+ * '<S2>'   : 'DCmotor_Speed_Ctrl/Speed Calculator '
+ * '<S3>'   : 'DCmotor_Speed_Ctrl/Speed Calculator /Discrete Derivative'
  */
 #endif                                 /* RTW_HEADER_DCmotor_Speed_Ctrl_h_ */
 

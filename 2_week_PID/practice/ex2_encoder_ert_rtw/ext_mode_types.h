@@ -7,9 +7,9 @@
  *
  * Code generation for model "ex2_encoder".
  *
- * Model version              : 1.28
+ * Model version              : 1.31
  * Simulink Coder version : 23.2 (R2023b) 01-Aug-2023
- * C source code generated on : Fri Feb  9 21:52:13 2024
+ * C source code generated on : Sun Feb 11 15:59:07 2024
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

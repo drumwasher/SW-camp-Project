@@ -27,10 +27,10 @@ den_Gd = Gd.Den{:};
 Vlim = 12; %voltage
 
 % Angular speed reference
-Wref = 445;
+Wref = 100;
 
 % Controller
-Kp = 0.05; % 0.05 100;
-Ki = 0.2; % 0.2 50;
+Kp = 100; % 0.05 100;
+Ki = 50; % 0.2 50;
 
 %sim("DCmotor_Speed_Ctrl_SILS.slx")
