@@ -1,0 +1,14 @@
+rt_nonfinite.o: \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rt_nonfinite.c \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rtGetNaN.h \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rt_nonfinite.h \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rtwtypes.h \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rtGetInf.h
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rtGetNaN.h:
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rt_nonfinite.h:
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rtwtypes.h:
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\3_DCMO~1\motor_ctrl_with_PID_ert_rtw\rtGetInf.h:

@@ -50,3 +50,6 @@ Motor_R_Direction = 12;
 BS     = 1;
 %부저:
 Buzzer = 5;
+
+default1=360;
+steering = 0.02;
