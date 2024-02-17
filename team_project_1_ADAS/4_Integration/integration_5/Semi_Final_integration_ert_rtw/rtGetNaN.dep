@@ -1,0 +1,11 @@
+rtGetNaN.o: \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rtGetNaN.c \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rtwtypes.h \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rtGetNaN.h \
+ C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rt_nonfinite.h
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rtwtypes.h:
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rtGetNaN.h:
+
+C:\Users\tkdle\OneDrive\πŸ≈¡»≠~1\SW-CAM~1\TEAM_P~1\4_INTE~1\INDD62~1\Semi_Final_integration_ert_rtw\rt_nonfinite.h:

@@ -1,0 +1,9 @@
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9801 (probably m2560)
+avrdude: reading input file "C:\Users\tkdle\OneDrive\πŸ≈¡ »≠∏È\SW-camp-Project\team_project_1_ADAS\4_Integration\integration_6/Final_integration_1.hex"
+avrdude: writing flash (35432 bytes):
+avrdude: 35432 bytes of flash written
+
+avrdude done.  Thank you.
+
